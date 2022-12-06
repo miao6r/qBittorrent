@@ -38,10 +38,12 @@
 
 #include "base/bittorrent/session.h"
 #include "base/bittorrent/sessionstatus.h"
+#include "base/bittorrent/cachestatus.h"
 #include "base/utils/misc.h"
 #include "speedlimitdialog.h"
 #include "uithememanager.h"
 #include "utils.h"
+#include "mainwindow.h"
 
 StatusBar::StatusBar(QWidget *parent)
     : QStatusBar(parent)
@@ -51,6 +53,10 @@ StatusBar::StatusBar(QWidget *parent)
     // Qt checks whether the stylesheet class inherits("QMacStyle") and this becomes false.
     setStyleSheet(u"QStatusBar::item { border-width: 0; }"_qs);
 #endif
+
+    totalLbl = Utils::Misc::friendlyUnit(0, false);
+    selectedLbl = Utils::Misc::friendlyUnit(0, false);
+    visibleLbl = Utils::Misc::friendlyUnit(0, false);
 
     BitTorrent::Session *const session = BitTorrent::Session::instance();
     connect(session, &BitTorrent::Session::speedLimitModeChanged, this, &StatusBar::updateAltSpeedsBtn);
@@ -88,6 +94,12 @@ StatusBar::StatusBar(QWidget *parent)
 
     m_DHTLbl = new QLabel(tr("DHT: %1 nodes").arg(0), this);
     m_DHTLbl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+
+    m_TSCLbl = new QLabel(tr("--"), this);
+    m_TSCLbl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+
+    m_QueueLbl = new QLabel(tr("I/O:--"), this);
+    m_QueueLbl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     m_altSpeedsBtn = new QPushButton(this);
     m_altSpeedsBtn->setFlat(true);
@@ -129,6 +141,8 @@ StatusBar::StatusBar(QWidget *parent)
 #ifndef Q_OS_MACOS
     statusSep4->setFrameShadow(QFrame::Raised);
 #endif
+    layout->addWidget(m_TSCLbl);
+    layout->addWidget(m_QueueLbl);
     layout->addWidget(m_DHTLbl);
     layout->addWidget(statusSep1);
     layout->addWidget(m_connecStatusLblIcon);
@@ -210,6 +224,35 @@ void StatusBar::updateDHTNodesNumber()
     }
 }
 
+void StatusBar::updateIOQueue()
+{
+    m_QueueLbl->setText(tr("I/O: %1 (%2) %3ms")
+                                .arg(Utils::Misc::friendlyUnit(
+                                        BitTorrent::Session::instance()->cacheStatus().queuedBytes,false))
+                                .arg(BitTorrent::Session::instance()->cacheStatus().jobQueueLength)
+                                .arg(BitTorrent::Session::instance()->cacheStatus().averageJobTime));
+}
+
+void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,qint64> *visible,QPair<qint64,qint64> *total)
+{
+    if (selected) {
+        selectedLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(selected->second, false)).arg(selected->first);
+    }
+    if (visible) {
+        visibleLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(visible->second, false)).arg(visible->first);
+    }
+    if (total) {
+        totalLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(total->second, false)).arg(total->first);
+    }
+    updateTorrentsCount();
+}
+
+void StatusBar::updateTorrentsCount()
+{
+    m_TSCLbl->setText(tr("%1, %2, %3")
+                               .arg(selectedLbl).arg(visibleLbl).arg(totalLbl));
+}
+
 void StatusBar::updateSpeedLabels()
 {
     const BitTorrent::SessionStatus &sessionStatus = BitTorrent::Session::instance()->status();
@@ -233,6 +276,8 @@ void StatusBar::refresh()
 {
     updateConnectionStatus();
     updateDHTNodesNumber();
+    updateIOQueue();
+    updateTorrentsCount();
     updateSpeedLabels();
 }
 

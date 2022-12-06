@@ -630,11 +630,18 @@ bool TransferListModel::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
+
+QPair<qint64,qint64> *TransferListModel::getTorrentsSize()
+{
+    qint64 c = m_torrentList.size();
+    return new QPair<qint64,qint64>(c,totalSize);
+}
+
+
 void TransferListModel::addTorrents(const QVector<BitTorrent::Torrent *> &torrents)
 {
     qsizetype row = m_torrentList.size();
     const qsizetype total = row + torrents.size();
-
     beginInsertRows({}, row, total);
 
     m_torrentList.reserve(total);
@@ -644,6 +651,7 @@ void TransferListModel::addTorrents(const QVector<BitTorrent::Torrent *> &torren
 
         m_torrentList.append(torrent);
         m_torrentMap[torrent] = row++;
+        totalSize += torrent->totalSize();
     }
 
     endInsertRows();
@@ -672,6 +680,7 @@ void TransferListModel::handleTorrentAboutToBeRemoved(BitTorrent::Torrent *const
     beginRemoveRows({}, row, row);
     m_torrentList.removeAt(row);
     m_torrentMap.remove(torrent);
+    totalSize -= torrent->totalSize();
     for (int &value : m_torrentMap)
     {
         if (value > row)

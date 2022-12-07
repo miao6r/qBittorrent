@@ -226,20 +226,23 @@ void StatusBar::updateDHTNodesNumber()
 
 void StatusBar::updateIOQueue()
 {
-    m_QueueLbl->setText(tr("I/O: %1 ")
-                                .arg(BitTorrent::Session::instance()->cacheStatus().jobQueueLength));
+    m_QueueLbl->setText(tr("I/O: %1 (%2) %3ms")
+                                .arg(Utils::Misc::friendlyUnit(
+                                        BitTorrent::Session::instance()->cacheStatus().queuedBytes,false))
+                                .arg(BitTorrent::Session::instance()->cacheStatus().jobQueueLength)
+                                .arg(BitTorrent::Session::instance()->cacheStatus().averageJobTime));
 }
 
 void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,qint64> *visible,QPair<qint64,qint64> *total)
 {
     if (selected) {
-        selectedLbl = tr("%1 (%2)").arg(selected->first).arg(Utils::Misc::friendlyUnit(selected->second, false));
+        selectedLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(selected->second, false)).arg(selected->first);
     }
     if (visible) {
-        visibleLbl = tr("%1 (%2)").arg(visible->first).arg(Utils::Misc::friendlyUnit(visible->second, false));
+        visibleLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(visible->second, false)).arg(visible->first);
     }
     if (total) {
-        totalLbl = tr("%1 (%2)").arg(total->first).arg(Utils::Misc::friendlyUnit(total->second, false));
+        totalLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(total->second, false)).arg(total->first);
     }
     updateTorrentsCount();
 }

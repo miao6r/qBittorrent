@@ -60,6 +60,8 @@ public:
     TransferListWidget(QWidget *parent, MainWindow *mainWindow);
     ~TransferListWidget() override;
     TransferListModel *getSourceModel() const;
+    QPair<qint64,qint64> *getSelectedTorrentsSize() const;
+    QPair<qint64,qint64> *getVisibleTorrentsSize() const;
 
 public slots:
     void setSelectionCategory(const QString &category);
@@ -131,7 +133,9 @@ private:
     QVector<BitTorrent::Torrent *> getVisibleTorrents() const;
     int visibleColumnsCount() const;
 
+
     TransferListModel *m_listModel = nullptr;
     TransferListSortModel *m_sortFilterModel = nullptr;
     MainWindow *m_mainWindow = nullptr;
+
 };

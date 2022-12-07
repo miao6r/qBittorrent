@@ -105,6 +105,9 @@ public:
 
     BitTorrent::Torrent *torrentHandle(const QModelIndex &index) const;
 
+public:
+    QPair<qint64,qint64> *getTorrentsSize();
+
 private slots:
     void addTorrents(const QVector<BitTorrent::Torrent *> &torrents);
     void handleTorrentAboutToBeRemoved(BitTorrent::Torrent *const torrent);
@@ -142,4 +145,5 @@ private:
     QIcon m_stalledDLIcon;
     QIcon m_stalledUPIcon;
     QIcon m_uploadingIcon;
+    qint64 totalSize =0 ;
 };

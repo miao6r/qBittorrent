@@ -241,6 +241,7 @@ TransferListModel *TransferListWidget::getSourceModel() const
     return m_listModel;
 }
 
+
 void TransferListWidget::previewFile(const Path &filePath)
 {
     Utils::Gui::openPath(filePath);
@@ -304,6 +305,28 @@ void TransferListWidget::torrentDoubleClicked()
         setTorrentOptions();
         break;
     }
+}
+
+QPair<qint64,qint64> *TransferListWidget::getSelectedTorrentsSize() const {
+    qint64 count = 0;
+    qint64 size = 0;
+    QVector<BitTorrent::Torrent *> selected = getSelectedTorrents();
+    count = selected.size();
+    for (BitTorrent::Torrent *const torrent : asConst(selected)) {
+        size+=torrent->totalSize();
+    }
+    return new QPair<qint64,qint64>(count,size);
+}
+
+QPair<qint64,qint64> *TransferListWidget::getVisibleTorrentsSize() const {
+    qint64 count = 0;
+    qint64 size = 0;
+    QVector<BitTorrent::Torrent *> selected = getVisibleTorrents();
+    count = selected.size();
+    for (BitTorrent::Torrent *const torrent : asConst(selected)) {
+        size+=torrent->totalSize();
+    }
+    return new QPair<qint64,qint64>(count,size);
 }
 
 QVector<BitTorrent::Torrent *> TransferListWidget::getSelectedTorrents() const

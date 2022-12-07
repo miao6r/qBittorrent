@@ -454,9 +454,16 @@ MainWindow::MainWindow(IGUIApplication *app, const State initialState)
 
     // Update the number of torrents (tab)
     updateNbTorrents();
+    updateTotalTorrentsSize();
+    updateVisibleTorrentsSize();
+    updateSelectedTorrentsSize();
     connect(m_transferListWidget->getSourceModel(), &QAbstractItemModel::rowsInserted, this, &MainWindow::updateNbTorrents);
     connect(m_transferListWidget->getSourceModel(), &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateNbTorrents);
-
+    connect(m_transferListWidget->getSourceModel(), &QAbstractItemModel::rowsInserted, this, &MainWindow::updateTotalTorrentsSize);
+    connect(m_transferListWidget->getSourceModel(), &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateTotalTorrentsSize);
+    connect(m_transferListWidget->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateSelectedTorrentsSize);
+    connect(m_transferListWidget->model(), &QAbstractItemModel::rowsInserted, this, &MainWindow::updateVisibleTorrentsSize);
+    connect(m_transferListWidget->model(), &QAbstractItemModel::rowsRemoved, this, &MainWindow::updateVisibleTorrentsSize);
     connect(pref, &Preferences::changed, this, &MainWindow::optionsSaved);
 
     qDebug("GUI Built");
@@ -492,6 +499,26 @@ void MainWindow::setExecutionLogMsgTypes(const Log::MsgTypes value)
 bool MainWindow::isDownloadTrackerFavicon() const
 {
     return m_storeDownloadTrackerFavicon;
+}
+
+void MainWindow::updateTotalTorrentsSize()
+{
+    QPair<qint64,qint64>* tPair = m_transferListWidget->getSourceModel()->getTorrentsSize();
+    m_statusBar->updateTorrentsSize(nullptr,nullptr,tPair);
+}
+
+
+void MainWindow::updateVisibleTorrentsSize()
+{
+    QPair<qint64,qint64>* vPair = m_transferListWidget->getVisibleTorrentsSize();
+    m_statusBar->updateTorrentsSize(nullptr,vPair, nullptr);
+}
+
+
+void MainWindow::updateSelectedTorrentsSize()
+{
+    QPair<qint64,qint64>* sPair = m_transferListWidget->getSelectedTorrentsSize();
+    m_statusBar->updateTorrentsSize(sPair, nullptr, nullptr);
 }
 
 void MainWindow::setDownloadTrackerFavicon(const bool value)

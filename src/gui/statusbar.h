@@ -53,6 +53,7 @@ signals:
 
 public slots:
     void showRestartRequired();
+    void updateTorrentsSize(QPair<qint64,qint64> *selected, QPair<qint64,qint64> *visible, QPair<qint64,qint64> *total);
 
 private slots:
     void refresh();
@@ -62,11 +63,18 @@ private slots:
 private:
     void updateConnectionStatus();
     void updateDHTNodesNumber();
+    void updateTorrentsCount();
     void updateSpeedLabels();
+    void updateIOQueue();
 
     QPushButton *m_dlSpeedLbl = nullptr;
     QPushButton *m_upSpeedLbl = nullptr;
     QLabel *m_DHTLbl = nullptr;
+    QLabel *m_TSCLbl = nullptr;
+    QLabel *m_QueueLbl = nullptr;
     QPushButton *m_connecStatusLblIcon = nullptr;
     QPushButton *m_altSpeedsBtn = nullptr;
+    QString totalLbl;
+    QString visibleLbl;
+    QString selectedLbl;
 };

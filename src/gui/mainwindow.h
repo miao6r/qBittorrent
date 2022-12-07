@@ -143,6 +143,9 @@ private slots:
     void downloadFromURLList(const QStringList &urlList);
     void updateAltSpeedsBtn(bool alternative);
     void updateNbTorrents();
+    void updateTotalTorrentsSize();
+    void updateVisibleTorrentsSize();
+    void updateSelectedTorrentsSize();
     void handleRSSUnreadCountUpdated(int count);
 
     void on_actionSearchWidget_triggered();

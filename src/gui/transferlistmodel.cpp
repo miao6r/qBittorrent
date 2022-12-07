@@ -634,7 +634,13 @@ bool TransferListModel::setData(const QModelIndex &index, const QVariant &value,
 QPair<qint64,qint64> *TransferListModel::getTorrentsSize()
 {
     qint64 c = m_torrentList.size();
-    return new QPair<qint64,qint64>(c,totalSize);
+    if (!m_total) {
+        m_total = new QPair<qint64, qint64>(c, totalSize);
+    } else {
+        m_total->first = c;
+        m_total->second = totalSize;
+    }
+    return m_total;
 }
 
 

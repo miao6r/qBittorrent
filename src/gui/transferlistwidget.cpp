@@ -307,7 +307,7 @@ void TransferListWidget::torrentDoubleClicked()
     }
 }
 
-QPair<qint64,qint64> *TransferListWidget::getSelectedTorrentsSize() const {
+QPair<qint64, qint64> * TransferListWidget::getSelectedTorrentsSize() {
     qint64 count = 0;
     qint64 size = 0;
     QVector<BitTorrent::Torrent *> selected = getSelectedTorrents();
@@ -315,18 +315,30 @@ QPair<qint64,qint64> *TransferListWidget::getSelectedTorrentsSize() const {
     for (BitTorrent::Torrent *const torrent : asConst(selected)) {
         size+=torrent->totalSize();
     }
-    return new QPair<qint64,qint64>(count,size);
+    if (!m_selected) {
+        m_selected = new QPair<qint64,qint64>(count,size);
+    } else {
+        m_selected->first = count;
+        m_selected->second = size;
+    }
+    return m_selected;
 }
 
-QPair<qint64,qint64> *TransferListWidget::getVisibleTorrentsSize() const {
+QPair<qint64,qint64> *TransferListWidget::getVisibleTorrentsSize() {
     qint64 count = 0;
     qint64 size = 0;
     QVector<BitTorrent::Torrent *> selected = getVisibleTorrents();
     count = selected.size();
-    for (BitTorrent::Torrent *const torrent : asConst(selected)) {
-        size+=torrent->totalSize();
+    for (BitTorrent::Torrent *const torrent: asConst(selected)) {
+        size += torrent->totalSize();
     }
-    return new QPair<qint64,qint64>(count,size);
+    if (!m_visible) {
+        m_visible = new QPair<qint64, qint64>(count, size);
+    } else {
+        m_visible->first = count;
+        m_visible->second = size;
+    }
+    return m_visible;
 }
 
 QVector<BitTorrent::Torrent *> TransferListWidget::getSelectedTorrents() const

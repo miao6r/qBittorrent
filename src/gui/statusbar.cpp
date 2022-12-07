@@ -235,6 +235,7 @@ void StatusBar::updateIOQueue()
 
 void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,qint64> *visible,QPair<qint64,qint64> *total)
 {
+    qDebug("updateTorrentsSize");
     if (selected) {
         selectedLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(selected->second, false)).arg(selected->first);
     }
@@ -249,12 +250,14 @@ void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,q
 
 void StatusBar::updateTorrentsCount()
 {
+    qDebug("updateTorrentsCount");
     m_TSCLbl->setText(tr("%1, %2, %3")
                                .arg(selectedLbl).arg(visibleLbl).arg(totalLbl));
 }
 
 void StatusBar::updateSpeedLabels()
 {
+    qDebug("updateSpeedLabels");
     const BitTorrent::SessionStatus &sessionStatus = BitTorrent::Session::instance()->status();
 
     QString dlSpeedLbl = Utils::Misc::friendlyUnit(sessionStatus.payloadDownloadRate, true);
@@ -277,7 +280,6 @@ void StatusBar::refresh()
     updateConnectionStatus();
     updateDHTNodesNumber();
     updateIOQueue();
-    updateTorrentsCount();
     updateSpeedLabels();
 }
 

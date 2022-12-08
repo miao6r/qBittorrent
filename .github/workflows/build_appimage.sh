@@ -39,7 +39,7 @@ echo '/usr/local/lib/x86_64-linux-gnu' >/etc/ld.so.conf.d/x86_64-linux-gnu-local
 
 apt update
 apt install -y software-properties-common apt-transport-https
-apt-add-repository -yn ppa:savoury1/backports
+apt-add-repository -yn ppa:/backports
 add-apt-repository -yn ppa:savoury1/display
 
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
@@ -240,18 +240,18 @@ cmake --build . --parallel
 cmake --install .
 
 # install qt6gtk2 for better look
-if [ ! -d "/usr/src/qt6gtk2/" ]; then
-  qt6gtk2_git_url="https://github.com/trialuser02/qt6gtk2.git"
-  if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
-    qt6gtk2_git_url="https://ghproxy.com/${qt6gtk2_git_url}"
-  fi
-  retry git clone --depth 1 --recursive "${qt6gtk2_git_url}" "/usr/src/qt6gtk2/"
-fi
-cd "/usr/src/qt6gtk2/"
-git pull
-git clean -fdx
-qmake
-make -j$(nproc) install
+#if [ ! -d "/usr/src/qt6gtk2/" ]; then
+#  qt6gtk2_git_url="https://github.com/trialuser02/qt6gtk2.git"
+#  if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
+#    qt6gtk2_git_url="https://ghproxy.com/${qt6gtk2_git_url}"
+#  fi
+#  retry git clone --depth 1 --recursive "${qt6gtk2_git_url}" "/usr/src/qt6gtk2/"
+#fi
+#cd "/usr/src/qt6gtk2/"
+#git pull
+#git clean -fdx
+#qmake
+#make -j$(nproc) install
 
 # build latest boost
 boost_ver="$(retry curl -ksSfL --compressed https://www.boost.org/users/download/ \| grep "'>Version\s*'" \| sed -r "'s/.*Version\s*([^<]+).*/\1/'" \| head -1)"

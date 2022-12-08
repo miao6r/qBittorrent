@@ -39,7 +39,7 @@ echo '/usr/local/lib/x86_64-linux-gnu' >/etc/ld.so.conf.d/x86_64-linux-gnu-local
 
 apt update
 apt install -y software-properties-common apt-transport-https
-apt-add-repository -yn ppa:/backports
+apt-add-repository -yn ppa:savoury1/backports
 add-apt-repository -yn ppa:savoury1/display
 
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
@@ -359,15 +359,13 @@ done
 exec "\${this_dir}/usr/bin/qbittorrent" "\$@"
 EOF
 chmod 755 -v /tmp/qbee/AppDir/AppRun
-
+# platformthemes   styles
 extra_plugins=(
   iconengines
   imageformats
   platforminputcontexts
   platforms
-  platformthemes
   sqldrivers
-  styles
   tls
   wayland-decoration-client
   wayland-graphics-integration-client

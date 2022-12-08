@@ -359,7 +359,14 @@ done
 exec "\${this_dir}/usr/bin/qbittorrent" "\$@"
 EOF
 chmod 755 -v /tmp/qbee/AppDir/AppRun
-# platformthemes   styles
+# platformthemes
+# styles
+#
+#  wayland-decoration-client
+#  wayland-graphics-integration-client
+#  wayland-graphics-integration-server
+#  wayland-shell-integration
+#  xcbglintegrations
 extra_plugins=(
   iconengines
   imageformats
@@ -367,10 +374,6 @@ extra_plugins=(
   platforms
   sqldrivers
   tls
-  wayland-decoration-client
-  wayland-graphics-integration-client
-  wayland-graphics-integration-server
-  wayland-shell-integration
   xcbglintegrations
 )
 exclude_libs=(

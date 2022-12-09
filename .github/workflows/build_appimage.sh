@@ -11,7 +11,7 @@
 set -o pipefail
 
 # match qt version prefix. E.g 5 --> 5.15.2, 5.12 --> 5.12.10
-export qt_ver="6.4.0"
+export qt_ver="6.4.1"
 export QT_VER_PREFIX="6.4"
 export LIBTORRENT_BRANCH="RC_1_2"
 
@@ -182,23 +182,24 @@ if [ ! -f "/usr/src/qtbase-${qt_ver}/.unpack_ok" ]; then
 fi
 cd "/usr/src/qtbase-${qt_ver}"
 rm -fr CMakeCache.txt CMakeFiles
+#  -ltcg \
+
+#  -c++std c++17 \
+#  -optimize-size \
+#  -openssl-linked \
+#  -qt-libjpeg \
+#  -qt-libpng \
+#  -qt-pcre \
+#  -qt-harfbuzz \
+#  -no-icu \
+#  -no-directfb \
+#  -no-linuxfb \
+#  -no-eglfs \
+#  -no-feature-testlib \
+#  -no-feature-vnc \
+#  -feature-optimize_full \
 ./configure \
-  -ltcg \
   -release \
-  -c++std c++17 \
-  -optimize-size \
-  -openssl-linked \
-  -qt-libjpeg \
-  -qt-libpng \
-  -qt-pcre \
-  -qt-harfbuzz \
-  -no-icu \
-  -no-directfb \
-  -no-linuxfb \
-  -no-eglfs \
-  -no-feature-testlib \
-  -no-feature-vnc \
-  -feature-optimize_full \
   -nomake examples \
   -nomake tests
 cmake --build . --parallel
@@ -301,8 +302,8 @@ rm -fr build/CMakeCache.txt
 cmake \
   -B build \
   -G "Ninja" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CXX_STANDARD=17
+  -DCMAKE_BUILD_TYPE="Release" \
+  -DCMAKE_CXX_STANDARD="17"
 cmake --build build
 cmake --install build
 # force refresh ld.so.cache
@@ -311,11 +312,11 @@ ldconfig
 # build qbittorrent
 cd "${SELF_DIR}/../../"
 rm -fr build/CMakeCache.txt
-#  -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs" \
 cmake \
   -B build \
   -G "Ninja" \
   -DQT6=ON \
+  -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs" \
   -DCMAKE_PREFIX_PATH="${QT_BASE_DIR}/lib/cmake/" \
   -DCMAKE_BUILD_TYPE="Release" \
   -DCMAKE_CXX_STANDARD="17" \

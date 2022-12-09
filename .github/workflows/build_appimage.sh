@@ -88,12 +88,12 @@ apt install -y \
   libxkbcommon-x11-dev \
   libwayland-dev \
   libwayland-egl-backend-dev \
-  gcc-11 \
-  g++-11
+  gcc-8 \
+  g++-8
 
 apt autoremove --purge -y
-# make gcc-11 as default gcc
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 800 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+# make gcc-8 as default gcc
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 # strip all compiled files by default
 export CFLAGS='-s'
 export CXXFLAGS='-s'

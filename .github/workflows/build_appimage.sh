@@ -311,11 +311,11 @@ ldconfig
 # build qbittorrent
 cd "${SELF_DIR}/../../"
 rm -fr build/CMakeCache.txt
+#  -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs" \
 cmake \
   -B build \
   -G "Ninja" \
   -DQT6=ON \
-  -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs" \
   -DCMAKE_PREFIX_PATH="${QT_BASE_DIR}/lib/cmake/" \
   -DCMAKE_BUILD_TYPE="Release" \
   -DCMAKE_CXX_STANDARD="17" \

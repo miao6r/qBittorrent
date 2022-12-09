@@ -213,7 +213,7 @@ export QT_BASE_DIR="$(ls -rd /usr/local/Qt-* | head -1)"
 export LD_LIBRARY_PATH="${QT_BASE_DIR}/lib:${LD_LIBRARY_PATH}"
 export PATH="${QT_BASE_DIR}/bin:${PATH}"
 if [ ! -f "/usr/src/qtsvg-${qt_ver}/.unpack_ok" ]; then
-  qtsvg_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qtsvg-everywhere-src-${qt_ver}.tar.xz"
+  qtsvg_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qtsvg-everywhere-opensource-src-${qt_ver}.tar.xz"
   retry curl -kSL --compressed "${qtsvg_url}" \| tar Jxf - -C "/usr/src/qtsvg-${qt_ver}" --strip-components 1
   touch "/usr/src/qtsvg-${qt_ver}/.unpack_ok"
 fi
@@ -223,7 +223,7 @@ rm -fr CMakeCache.txt
 cmake --build . --parallel
 cmake --install .
 if [ ! -f "/usr/src/qttools-${qt_ver}/.unpack_ok" ]; then
-  qttools_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qttools-everywhere-src-${qt_ver}.tar.xz"
+  qttools_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qttools-everywhere-opensource-src-${qt_ver}.tar.xz"
   retry curl -kSL --compressed "${qttools_url}" \| tar Jxf - -C "/usr/src/qttools-${qt_ver}" --strip-components 1
   touch "/usr/src/qttools-${qt_ver}/.unpack_ok"
 fi
@@ -237,7 +237,7 @@ cmake --install .
 # Remove qt-wayland until next release: https://bugreports.qt.io/browse/QTBUG-104318
 # qt-wayland
 if [ ! -f "/usr/src/qtwayland-${qt_ver}/.unpack_ok" ]; then
-  qtwayland_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qtwayland-everywhere-src-${qt_ver}.tar.xz"
+  qtwayland_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qtwayland-everywhere-opensource-src-${qt_ver}.tar.xz"
   retry curl -kSL --compressed "${qtwayland_url}" \| tar Jxf - -C "/usr/src/qtwayland-${qt_ver}" --strip-components 1
   touch "/usr/src/qtwayland-${qt_ver}/.unpack_ok"
 fi

@@ -11,7 +11,8 @@
 set -o pipefail
 
 # match qt version prefix. E.g 5 --> 5.15.2, 5.12 --> 5.12.10
-export QT_VER_PREFIX="6"
+export qt_ver"6.4.0"
+export QT_VER_PREFIX="6.4"
 export LIBTORRENT_BRANCH="RC_1_2"
 
 rm -f /etc/apt/sources.list.d/*.list*
@@ -41,6 +42,7 @@ apt update
 apt install -y software-properties-common apt-transport-https
 apt-add-repository -yn ppa:savoury1/backports
 add-apt-repository -yn ppa:savoury1/display
+add-apt-repository ppa:ubuntu-toolchain-r/test
 
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
   sed -i 's@http://ppa.launchpad.net@https://launchpad.proxy.ustclug.org@' /etc/apt/sources.list.d/*.list
@@ -87,11 +89,12 @@ apt install -y \
   libxkbcommon-x11-dev \
   libwayland-dev \
   libwayland-egl-backend-dev \
-  g++-8
+  gcc-11 \
+  g++-11
 
 apt autoremove --purge -y
-# make gcc-8 as default gcc
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+# make gcc-11 as default gcc
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 800 --slave /usr/bin/g++ g++ /usr/bin/g++-11
 # strip all compiled files by default
 export CFLAGS='-s'
 export CXXFLAGS='-s'

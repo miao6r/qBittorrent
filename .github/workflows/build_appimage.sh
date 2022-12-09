@@ -11,8 +11,7 @@
 set -o pipefail
 
 # match qt version prefix. E.g 5 --> 5.15.2, 5.12 --> 5.12.10
-export qt_ver="6.4.1"
-export QT_VER_PREFIX="6.4"
+export QT_VER_PREFIX="5"
 export LIBTORRENT_BRANCH="RC_1_2"
 
 rm -f /etc/apt/sources.list.d/*.list*
@@ -183,8 +182,6 @@ fi
 cd "/usr/src/qtbase-${qt_ver}"
 rm -fr CMakeCache.txt CMakeFiles
 #  -ltcg \
-
-#  -c++std c++17 \
 #  -optimize-size \
 #  -openssl-linked \
 #  -qt-libjpeg \
@@ -200,6 +197,7 @@ rm -fr CMakeCache.txt CMakeFiles
 #  -feature-optimize_full \
 ./configure \
   -release \
+  -c++std c++17 \
   -nomake examples \
   -nomake tests
 cmake --build . --parallel
@@ -312,6 +310,7 @@ ldconfig
 # build qbittorrent
 cd "${SELF_DIR}/../../"
 rm -fr build/CMakeCache.txt
+
 #   -DQT6=ON \
 cmake \
   -B build \
@@ -363,14 +362,15 @@ done
 exec "\${this_dir}/usr/bin/qbittorrent" "\$@"
 EOF
 chmod 755 -v /tmp/qbee/AppDir/AppRun
-# platformthemes
-# styles
+
 #
 #  xcbglintegrations
 extra_plugins=(
   iconengines
   imageformats
   platforminputcontexts
+  platformthemes
+  styles
   platforms
   sqldrivers
   tls

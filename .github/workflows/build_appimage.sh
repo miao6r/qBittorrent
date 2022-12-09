@@ -196,8 +196,15 @@ rm -fr CMakeCache.txt CMakeFiles
 #  -no-feature-vnc \
 #  -feature-optimize_full \
 ./configure \
+  -ltcg \
+  -openssl-linked \
+  -qt-libjpeg \
+  -qt-libpng \
+  -qt-pcre \
+  -qt-harfbuzz \
   -release \
   -c++std c++17 \
+  -feature-optimize_full \
   -nomake examples \
   -nomake tests
 cmake --build . --parallel

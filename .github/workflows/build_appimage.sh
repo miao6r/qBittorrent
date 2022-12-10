@@ -86,10 +86,11 @@ apt install -y \
   libxcb-xkb-dev \
   libxkbcommon-dev \
   libxkbcommon-x11-dev \
-  libwayland-dev \
-  libwayland-egl-backend-dev \
   gcc-8 \
   g++-8
+
+#  libwayland-dev \
+#  libwayland-egl-backend-dev \
 
 apt autoremove --purge -y
 # make gcc-8 as default gcc
@@ -205,6 +206,12 @@ rm -fr CMakeCache.txt CMakeFiles
   -release \
   -c++std c++17 \
   -feature-optimize_full \
+  -skip wayland \
+  -no-directfb \
+  -no-linuxfb \
+  -no-eglfs \
+  -no-feature-testlib \
+  -no-feature-vnc \
   -nomake examples \
   -nomake tests
 cmake --build . --parallel
@@ -236,17 +243,17 @@ cmake --install .
 
 # Remove qt-wayland until next release: https://bugreports.qt.io/browse/QTBUG-104318
 # qt-wayland
-if [ ! -f "/usr/src/qtwayland-${qt_ver}/.unpack_ok" ]; then
-  qtwayland_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qtwayland-everywhere-src-${qt_ver}.tar.xz"
-  retry curl -kSL --compressed "${qtwayland_url}" \| tar Jxf - -C "/usr/src/qtwayland-${qt_ver}" --strip-components 1
-  touch "/usr/src/qtwayland-${qt_ver}/.unpack_ok"
-fi
-cd "/usr/src/qtwayland-${qt_ver}"
-rm -fr CMakeCache.txt
-"${QT_BASE_DIR}/bin/qt-configure-module" .
-cat config.summary
-cmake --build . --parallel
-cmake --install .
+#if [ ! -f "/usr/src/qtwayland-${qt_ver}/.unpack_ok" ]; then
+#  qtwayland_url="https://download.qt.io/official_releases/qt/${qt_major_ver}/${qt_ver}/submodules/qtwayland-everywhere-src-${qt_ver}.tar.xz"
+#  retry curl -kSL --compressed "${qtwayland_url}" \| tar Jxf - -C "/usr/src/qtwayland-${qt_ver}" --strip-components 1
+#  touch "/usr/src/qtwayland-${qt_ver}/.unpack_ok"
+#fi
+#cd "/usr/src/qtwayland-${qt_ver}"
+#rm -fr CMakeCache.txt
+#"${QT_BASE_DIR}/bin/qt-configure-module" .
+#cat config.summary
+#cmake --build . --parallel
+#cmake --install .
 
 # install qt6gtk2 for better look
 #if [ ! -d "/usr/src/qt6gtk2/" ]; then
@@ -345,7 +352,7 @@ ln -svf qbittorrent.svg /tmp/qbee/AppDir/.DirIcon
 cat >/tmp/qbee/AppDir/AppRun <<EOF
 #!/bin/bash -e
 this_dir="\$(readlink -f "\$(dirname "\$0")")"
-export XDG_DATA_DIRS="\${this_dir}/usr/share:\${XDG_DATA_DIRS}:/usr/share:/usr/local/share"
+#export XDG_DATA_DIRS="\${this_dir}/usr/share:\${XDG_DATA_DIRS}:/usr/share:/usr/local/share"
 #export QT_QPA_PLATFORMTHEMES=gtk2
 #export QT_STYLE_OVERRIDE=qt6gtk2
 # Find the system certificates location
@@ -382,11 +389,6 @@ extra_plugins=(
   platforms
   sqldrivers
   tls
-  wayland-decoration-client
-  wayland-graphics-integration-client
-  wayland-graphics-integration-server
-  wayland-shell-integration
-  xcbglintegrations
 )
 exclude_libs=(
 #  libatk-1.0.so.0

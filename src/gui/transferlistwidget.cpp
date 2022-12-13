@@ -840,9 +840,17 @@ void TransferListWidget::exportTorrent()
         bool hasError = false;
         for (const BitTorrent::Torrent *torrent : torrents)
         {
-            const Path filePath = savePath / Path(torrent->name() + u".torrent");
+
+            const QString validName = Utils::Fs::toValidFileName(torrent->name());
+            const QString torrentId = torrent->infoHash().toTorrentID().toString().left(8);
+            QString torrentExportFilename = u"%1 %2.torrent"_qs.arg(validName).arg(torrentId);
+            Path filePath = savePath / Path(torrentExportFilename);
+            //int counter = 0;
             if (filePath.exists())
             {
+                // Append number to torrent name to make it unique
+                //torrentExportFilename = u"%1 %2.torrent"_qs.arg(validName).arg(++counter);
+                //filePath = savePath / Path(torrentExportFilename);
                 LogMsg(errorMsg.arg(torrent->name(), filePath.toString(), tr("A file with the same name already exists")) , Log::WARNING);
                 hasError = true;
                 continue;

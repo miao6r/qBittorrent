@@ -228,10 +228,10 @@ void StatusBar::updateIOQueue()
 {
     const BitTorrent::CacheStatus cs = BitTorrent::Session::instance()->cacheStatus();
     const BitTorrent::SessionStatus ss = BitTorrent::Session::instance()->status();
-    m_QueueLbl->setText(u" Peers: %1 I/O: %2(%3%) %4 %5ms"_qs
+    m_QueueLbl->setText(u" Peers:%1 Cache:%2(%3%) I/O:%4(%5ms)"_qs
                                 .arg(ss.peersCount,false)
-                                .arg(Utils::Misc::friendlyUnit(cs.totalUsedBuffers, false))
-                                .arg(cs.readRatio)
+                                .arg(Utils::Misc::friendlyUnit(cs.totalUsedBuffers * 16 * 1024, false))
+                                .arg((cs.readRatio > 0)? Utils::String::fromDouble((100 * cs.readRatio), 2): u"0"_qs)
                                 .arg(cs.jobQueueLength)
                                 .arg(cs.averageJobTime));
 }

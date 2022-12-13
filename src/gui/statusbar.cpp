@@ -226,16 +226,18 @@ void StatusBar::updateDHTNodesNumber()
 
 void StatusBar::updateIOQueue()
 {
-    m_QueueLbl->setText(tr("I/O: %1 (%2) %3ms")
-                                .arg(Utils::Misc::friendlyUnit(
-                                        BitTorrent::Session::instance()->cacheStatus().queuedBytes,false))
-                                .arg(BitTorrent::Session::instance()->cacheStatus().jobQueueLength)
-                                .arg(BitTorrent::Session::instance()->cacheStatus().averageJobTime));
+    const BitTorrent::CacheStatus cs = BitTorrent::Session::instance()->cacheStatus();
+    const BitTorrent::SessionStatus ss = BitTorrent::Session::instance()->status();
+    m_QueueLbl->setText(u" Peers: %1 I/O: %2(%3%) %4 %5ms"_qs
+                                .arg(ss.peersCount,false)
+                                .arg(Utils::Misc::friendlyUnit(cs.totalUsedBuffers, false))
+                                .arg(cs.readRatio)
+                                .arg(cs.jobQueueLength)
+                                .arg(cs.averageJobTime));
 }
 
 void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,qint64> *visible,QPair<qint64,qint64> *total)
 {
-    qDebug("updateTorrentsSize");
     if (selected) {
         selectedLbl = tr("%1 (%2)").arg(Utils::Misc::friendlyUnit(selected->second, false)).arg(selected->first);
     }

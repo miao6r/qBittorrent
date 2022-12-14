@@ -661,6 +661,7 @@ window.addEvent('load', function() {
                     if (response['torrents']) {
                         let updateTorrentList = false;
                         for (const key in response['torrents']) {
+                            let totalSize = 0;
                             response['torrents'][key]['hash'] = key;
                             response['torrents'][key]['rowId'] = key;
                             if (response['torrents'][key]['state'])
@@ -746,8 +747,20 @@ window.addEvent('load', function() {
         }
         else
             document.title = ("qBittorrent " + qbtVersion() + " QBT_TR(Web UI)QBT_TR[CONTEXT=OptionsDialog]");
-        $('freeSpaceOnDisk').set('html', 'QBT_TR(Free space: %1)QBT_TR[CONTEXT=HttpServer]'.replace("%1", window.qBittorrent.Misc.friendlyUnit(serverState.free_space_on_disk)));
-        $('DHTNodes').set('html', 'QBT_TR(DHT: %1 nodes)QBT_TR[CONTEXT=StatusBar]'.replace("%1", serverState.dht_nodes));
+        $('freeSpaceOnDisk').set('html', 'QBT_TR(F:%1)QBT_TR[CONTEXT=HttpServer]'.replace("%1", window.qBittorrent.Misc.friendlyUnit(serverState.free_space_on_disk)));
+        //$('DHTNodes').set('html', 'QBT_TR(DHT:%1)QBT_TR[CONTEXT=StatusBar]'.replace("%1", serverState.dht_nodes));
+        let ts = torrentsTable.getTorrentsSize();
+        $('sizeStatusBar').set('html','%1(%2),%3(%4),%5(%6) P:%7 C:%8(%9%) IO:%10'
+            .replace("%1", window.qBittorrent.Misc.friendlyUnit(ts.selected_size, false))
+            .replace("%2", ts.selected_count)
+            .replace("%3", window.qBittorrent.Misc.friendlyUnit(ts.visible_size, false))
+            .replace("%4", ts.visible_count)
+            .replace("%5", window.qBittorrent.Misc.friendlyUnit(ts.total_size, false))
+            .replace("%6", ts.total_count)
+            .replace("%7", serverState.total_peer_connections)
+            .replace("%8", window.qBittorrent.Misc.friendlyUnit(serverState.total_buffers_size, false))
+            .replace("%9", serverState.read_cache_hits)
+            .replace("%10", serverState.queued_io_jobs));
 
         // Statistics dialog
         if (document.getElementById("statisticsContent")) {

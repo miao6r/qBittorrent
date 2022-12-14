@@ -80,6 +80,14 @@ window.qBittorrent.DynamicTable = (function() {
             this.rows = new Hash();
             this.selectedRows = [];
             this.columns = [];
+            this.torrentsSize = {
+                selected_count: 0,
+                selected_size: 0,
+                visible_count: 0,
+                visible_size: 0,
+                total_count: 0,
+                total_size: 0,
+            };
             this.contextMenu = contextMenu;
             this.sortedColumn = LocalPreferences.get('sorted_column_' + this.dynamicTableDivId, 0);
             this.reverseSort = LocalPreferences.get('reverse_sort_' + this.dynamicTableDivId, '0');
@@ -90,6 +98,17 @@ window.qBittorrent.DynamicTable = (function() {
             this.setupHeaderEvents();
             this.setupHeaderMenu();
             this.setSortedColumnIcon(this.sortedColumn, null, (this.reverseSort === '1'));
+        },
+        getTorrentsSize: function() {
+            if (this.torrentsSize.selected_count != this.selectedRows.length) {
+                const rows = this.selectedRowsData();
+                this.torrentsSize.selected_size = 0;
+                this.torrentsSize.selected_count = rows.length;
+                for (const row of rows) {
+                    this.torrentsSize.selected_size += row['full_data']['total_size'];
+                }
+            }
+            return this.torrentsSize;
         },
 
         setupCommonEvents: function() {
@@ -646,6 +665,10 @@ window.qBittorrent.DynamicTable = (function() {
                     'rowId': rowId
                 };
                 this.rows.set(rowId, row);
+                this.torrentsSize.total_count += 1;
+                if (data.hasOwnProperty('total_size')) {
+                    this.torrentsSize.total_size += data['total_size'];
+                }
             }
             else
                 row = this.rows.get(rowId);
@@ -820,6 +843,13 @@ window.qBittorrent.DynamicTable = (function() {
         },
 
         removeRow: function(rowId) {
+            const row = this.rows.get(rowId);
+            if (row !== undefined && row!== null) {
+                this.torrentsSize.total_count -= 1;
+                if (row['full_data'].hasOwnProperty('total_size')) {
+                    this.torrentsSize.total_size -= row['full_data']['total_size'];
+                }
+            }
             this.selectedRows.erase(rowId);
             const tr = this.getTrByRowId(rowId);
             if (tr !== null) {
@@ -833,6 +863,12 @@ window.qBittorrent.DynamicTable = (function() {
         clear: function() {
             this.deselectAll();
             this.rows.empty();
+            this.torrentsSize.total_size = 0;
+            this.torrentsSize.total_count = 0;
+            this.torrentsSize.selected_size = 0;
+            this.torrentsSize.selected_count = 0;
+            this.torrentsSize.visible_size = 0;
+            this.torrentsSize.visible_count = 0;
             const trs = this.tableBody.getElements('tr');
             while (trs.length > 0) {
                 trs[trs.length - 1].dispose();
@@ -842,6 +878,16 @@ window.qBittorrent.DynamicTable = (function() {
 
         selectedRowsIds: function() {
             return this.selectedRows.slice();
+        },
+
+        selectedRowsData: function() {
+            let selectedRows = [];
+            const rowsIds = this.selectedRowsIds();
+            for (const rowId of rowsIds) {
+                const row = this.rows.get(rowId)
+                selectedRows.push(row)
+            }
+            return selectedRows;
         },
 
         getRowIds: function() {
@@ -1444,14 +1490,16 @@ window.qBittorrent.DynamicTable = (function() {
             const rows = this.rows.getValues();
             const filterText = $('torrentsFilterInput').value.trim().toLowerCase();
             const filterTerms = (filterText.length > 0) ? filterText.split(" ") : null;
+            this.torrentsSize.visible_size = 0;
 
             for (let i = 0; i < rows.length; ++i) {
                 if (this.applyFilter(rows[i], selected_filter, selected_category, selectedTag, selectedTracker, filterTerms)) {
                     filteredRows.push(rows[i]);
                     filteredRows[rows[i].rowId] = rows[i];
+                    this.torrentsSize.visible_size += rows[i]['full_data']['total_size'];
                 }
             }
-
+            this.torrentsSize.visible_count = filteredRows.length;
             filteredRows.sort(function(row1, row2) {
                 const column = this.columns[this.sortedColumn];
                 const res = column.compareRows(row1, row2);
@@ -1485,6 +1533,7 @@ window.qBittorrent.DynamicTable = (function() {
 
         onSelectedRowChanged: function() {
             updatePropertiesPanel();
+            this.torrentsSize.selected_count = -1;
         }
     });
 

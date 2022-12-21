@@ -29,6 +29,7 @@
 #pragma once
 
 #include <QObject>
+#include <QMap>
 
 #include "base/path.h"
 
@@ -47,8 +48,8 @@ public:
 
 public slots:
     void search(const BitTorrent::TorrentID &id, const PathList &originalFileNames
-                , const Path &savePath, const Path &downloadPath, bool forceAppendExt);
+                , const Path &savePath, const Path &downloadPath, bool forceAppendExt, const QMap<QString, Path> &categoryPaths);
 
 signals:
-    void searchFinished(const BitTorrent::TorrentID &id, const Path &savePath, const PathList &fileNames);
+    void searchFinished(const BitTorrent::TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category);
 };

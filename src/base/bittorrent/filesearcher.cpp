@@ -31,7 +31,7 @@
 #include "base/bittorrent/infohash.h"
 
 void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &originalFileNames
-                          , const Path &savePath, const Path &downloadPath, const bool forceAppendExt)
+                          , const Path &savePath, const Path &downloadPath, const bool forceAppendExt, const QMap<QString, Path> &categoryPaths)
 {
     const auto findInDir = [](const Path &dirPath, PathList &fileNames, const bool forceAppendExt) -> bool
     {
@@ -59,8 +59,20 @@ void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &origi
 
         return found;
     };
-
+    QString category;
     Path usedPath = savePath;
+    for(const QString c:categoryPaths.keys()) {
+        Path p = categoryPaths[c];
+        PathList searchList;
+        searchList.append(originalFileNames.first());
+        searchList.append(originalFileNames.last());
+        const bool found = findInDir(p, searchList, false);
+        if(found) {
+            category = c;
+            usedPath = p;
+            break;
+        }
+    }
     PathList adjustedFileNames = originalFileNames;
     const bool found = findInDir(usedPath, adjustedFileNames, (forceAppendExt && downloadPath.isEmpty()));
     if (!found && !downloadPath.isEmpty())
@@ -69,5 +81,5 @@ void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &origi
         findInDir(usedPath, adjustedFileNames, forceAppendExt);
     }
 
-    emit searchFinished(id, usedPath, adjustedFileNames);
+    emit searchFinished(id, usedPath, adjustedFileNames, category);
 }

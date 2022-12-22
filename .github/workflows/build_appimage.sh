@@ -209,7 +209,6 @@ rm -fr CMakeCache.txt CMakeFiles
   -qt-pcre \
   -qt-harfbuzz \
   -release \
-  -static \
   -c++std c++17 \
   -feature-optimize_full \
   -skip wayland \

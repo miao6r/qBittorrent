@@ -209,6 +209,7 @@ rm -fr CMakeCache.txt CMakeFiles
   -qt-pcre \
   -qt-harfbuzz \
   -release \
+  -dynamic \
   -c++std c++17 \
   -feature-optimize_full \
   -skip wayland \
@@ -259,7 +260,9 @@ cmake --install .
 #cat config.summary
 #cmake --build . --parallel
 #cmake --install .
-
+ls -al /usr/local
+echo $PATH
+echo $QT_INSTALL_PLUGINS
 # install qt6gtk2 for better look
 if [ ! -d "/usr/src/qt6gtk2/" ]; then
   qt6gtk2_git_url="https://github.com/trialuser02/qt6gtk2.git"
@@ -397,6 +400,8 @@ EOF
 
 cd "/tmp/qbee"
 export EXTRA_QT_PLUGINS="styles;iconengines"
+export DEPLOY_PLATFORM_THEMES=1
+export DEBUG=1
 APPIMAGE_EXTRACT_AND_RUN=1  \
   OUTPUT='qBittorrent-x86_64-qt.AppImage' \
   /tmp/linuxdeploy-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage  --plugin qt

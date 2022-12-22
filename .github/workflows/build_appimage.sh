@@ -57,7 +57,7 @@ apt install -y \
   libzstd-dev \
   zlib1g-dev \
   libbrotli-dev \
-  libdouble-conversion-dev-dev \
+  libdouble-conversion-dev \
   libgraphite2-dev \
   libsystemd-dev \
   libxcb1-dev \

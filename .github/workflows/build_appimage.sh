@@ -366,18 +366,18 @@ ln -svf qbittorrent.svg /tmp/qbee/AppDir/.DirIcon
 mkdir -p "/tmp/qbee/AppDir/apprun-hooks/"
 cat >/tmp/qbee/AppDir/apprun-hooks/setup_env.sh <<EOF
 # this file is called from AppRun so 'root_dir' will point to where AppRun is
-root_dir="$(readlink -f "$(dirname "$0")")"
+root_dir="\$(readlink -f "\$(dirname "\$0")")"
 
 # Insert the default values because after the test we prepend our path
 # and it will create problems with DEs (eg KDE) that don't set the variable
 # and rely on the default paths
-if [[ -z ${XDG_DATA_DIRS} ]]; then
+if [[ -z \${XDG_DATA_DIRS} ]]; then
     XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
 fi
 
-export XDG_DATA_DIRS="${root_dir}/usr/share:${XDG_DATA_DIRS}"
+export XDG_DATA_DIRS="\${root_dir}/usr/share:\${XDG_DATA_DIRS}"
 
-case "${QT_QPA_PLATFORMTHEME}" in
+case "\${QT_QPA_PLATFORMTHEME}" in
     *gtk2*)
         export QT_QPA_PLATFORMTHEME=qt6gtk2
         ;;
@@ -387,7 +387,7 @@ case "${QT_QPA_PLATFORMTHEME}" in
         ;;
 esac
 
-case "${QT_STYLE_OVERRIDE}" in
+case "\${QT_STYLE_OVERRIDE}" in
     *gtk2*)
         export QT_QPA_PLATFORMTHEME=qt6gtk2
         unset QT_STYLE_OVERRIDE

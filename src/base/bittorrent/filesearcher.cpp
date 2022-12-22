@@ -61,28 +61,32 @@ void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &origi
     };
     QString category;
     Path usedPath = savePath;
-    QHash<QString, bool> visited;
-    for(const QString c:categoryPaths.keys()) {
-        Path p = categoryPaths[c];
-        QString ps = p.toString();
-        if(visited.contains(ps)) {
-            continue;
-        }
-        visited[ps] = true;
-        PathList searchList;
-        searchList.append(originalFileNames.first());
-        if(originalFileNames.length()>1) {
-            searchList.append(originalFileNames.last());
-        }
-        const bool found = findInDir(p, searchList, false);
-        if(found) {
-            category = c;
-            usedPath = p;
-            break;
+
+    // search savePath for completed files first
+    PathList searchList;
+    searchList.append(originalFileNames.first());
+    bool found = findInDir(usedPath, searchList, false);
+    if (!found) {
+        // search category paths for completed files
+        QHash<QString, bool> visited;
+        for(const QString &c:categoryPaths.keys()) {
+            Path p = categoryPaths[c];
+            QString ps = p.toString();
+            if(visited.contains(ps)) {
+                continue;
+            }
+            visited[ps] = true;
+            const bool f = findInDir(p, searchList, false);
+            if(f) {
+                category = c;
+                usedPath = p;
+                break;
+            }
         }
     }
+
     PathList adjustedFileNames = originalFileNames;
-    const bool found = findInDir(usedPath, adjustedFileNames, (forceAppendExt && downloadPath.isEmpty()));
+    found = findInDir(usedPath, adjustedFileNames, (forceAppendExt && downloadPath.isEmpty()));
     if (!found && !downloadPath.isEmpty())
     {
         usedPath = downloadPath;

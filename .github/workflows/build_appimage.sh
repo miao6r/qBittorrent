@@ -88,15 +88,15 @@ apt install -y \
   libxcb-xkb-dev \
   libxkbcommon-dev \
   libxkbcommon-x11-dev \
-  gcc-11 \
-  g++-11
+  gcc-8 \
+  g++-8
 
 #  libwayland-dev \
 #  libwayland-egl-backend-dev \
 
 apt autoremove --purge -y
 # make gcc-8 as default gcc
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 800 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 # strip all compiled files by default
 export CFLAGS='-s'
 export CXXFLAGS='-s'
@@ -335,6 +335,7 @@ cmake \
   -B build \
   -G "Ninja" \
   -DQT6=ON \
+  -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs" \
   -DCMAKE_PREFIX_PATH="${QT_BASE_DIR}/lib/cmake/" \
   -DCMAKE_BUILD_TYPE="Release" \
   -DCMAKE_CXX_STANDARD="17" \

@@ -5,7 +5,7 @@ COPY ./ /qbt/
 WORKDIR /qbt/
 
 
-RUN .github/workflows/build_appimage2.sh
+RUN .github/workflows/build_appimage.sh
 
 FROM scratch AS export-stage
 COPY --from=stage1 /qbt/.github/workflows/*.AppImage ./build/

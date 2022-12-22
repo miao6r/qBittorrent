@@ -261,8 +261,6 @@ cmake --install .
 #cmake --build . --parallel
 #cmake --install .
 ls -al /usr/local
-echo $PATH
-echo $QT_INSTALL_PLUGINS
 # install qt6gtk2 for better look
 if [ ! -d "/usr/src/qt6gtk2/" ]; then
   qt6gtk2_git_url="https://github.com/trialuser02/qt6gtk2.git"
@@ -404,7 +402,7 @@ export DEPLOY_PLATFORM_THEMES=1
 export DEBUG=1
 APPIMAGE_EXTRACT_AND_RUN=1  \
   OUTPUT='qBittorrent-x86_64-qt.AppImage' \
-  /tmp/linuxdeploy-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage  --plugin qt
+  /tmp/linuxdeploy-plugin-qt-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage  --plugin qt
 
 
 

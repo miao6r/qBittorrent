@@ -59,6 +59,9 @@ apt install -y \
   libzstd-dev \
   zlib1g-dev \
   libbrotli-dev \
+  libdouble-conversion-dev-dev \
+  libgraphite2-dev \
+  libsystemd-dev \
   libxcb1-dev \
   libicu-dev \
   libgtk2.0-dev \
@@ -73,7 +76,6 @@ apt install -y \
   libxi-dev \
   libxrender-dev \
   libxcb1-dev \
-  libxcb-glx0-dev \
   libxcb-keysyms1-dev \
   libxcb-image0-dev \
   libxcb-shm0-dev \
@@ -209,6 +211,7 @@ rm -fr CMakeCache.txt CMakeFiles
   -qt-pcre \
   -qt-harfbuzz \
   -release \
+  -static \
   -c++std c++17 \
   -feature-optimize_full \
   -skip wayland \
@@ -376,7 +379,7 @@ if [[ -z \${XDG_DATA_DIRS} ]]; then
 fi
 
 export XDG_DATA_DIRS="\${root_dir}/usr/share:\${XDG_DATA_DIRS}"
-
+export QT_QPA_PLATFORMTHEME=gtk3
 case "\${QT_QPA_PLATFORMTHEME}" in
     *gtk2*)
         export QT_QPA_PLATFORMTHEME=qt6gtk2
@@ -399,7 +402,8 @@ EOF
 ls -al /tmp
 ls -al /tmp/qbee
 cd "/tmp/qbee"
-APPIMAGE_EXTRACT_AND_RUN=1 \
+export EXTRA_QT_PLUGINS="styles;iconengines"
+APPIMAGE_EXTRACT_AND_RUN=1  \
   OUTPUT='qBittorrent-x86_64.AppImage' \
   /tmp/linuxdeploy-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage  --plugin qt
 

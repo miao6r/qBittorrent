@@ -88,6 +88,7 @@ apt install -y \
   libxcb-xkb-dev \
   libxkbcommon-dev \
   libxkbcommon-x11-dev \
+  libgtk-3-dev \
   gcc-8 \
   g++-8
 
@@ -203,15 +204,17 @@ rm -fr CMakeCache.txt CMakeFiles
 #  -feature-optimize_full \
 ./configure \
   -ltcg \
+  -xcb \
+  -gtk \
   -openssl-linked \
   -qt-libjpeg \
   -qt-libpng \
   -qt-pcre \
   -qt-harfbuzz \
   -release \
-  -dynamic \
   -c++std c++17 \
   -feature-optimize_full \
+  -feature-gtk3 \
   -skip wayland \
   -no-directfb \
   -no-linuxfb \

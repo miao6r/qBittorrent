@@ -405,7 +405,7 @@ export DEPLOY_PLATFORM_THEMES=1
 export DEBUG=1
 APPIMAGE_EXTRACT_AND_RUN=1  \
   OUTPUT='qBittorrent-x86_64-qt.AppImage' \
-  /tmp/linuxdeploy-plugin-qt-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage  --plugin qt
+  /tmp/linuxdeploy-plugin-qt-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage
 
 
 

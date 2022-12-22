@@ -6,7 +6,3 @@ WORKDIR /qbt/
 
 
 RUN .github/workflows/build_appimage1.sh
-
-FROM scratch AS export-stage
-COPY --from=stage1 /qbt/.github/workflows/*.AppImage ./build/
-COPY --from=stage1  /tmp/qbee/usr/bin/qbittorrent ./build/

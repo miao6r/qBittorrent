@@ -10,7 +10,6 @@
 
 set -o pipefail
 
-
 # match qt version prefix. E.g 5 --> 5.15.2, 5.12 --> 5.12.10
 export QT_VER_PREFIX="6"
 export LIBTORRENT_BRANCH="RC_1_2"
@@ -40,7 +39,6 @@ echo '/usr/local/lib/x86_64-linux-gnu' >/etc/ld.so.conf.d/x86_64-linux-gnu-local
 
 apt update
 apt install -y software-properties-common apt-transport-https
-
 apt-add-repository -yn ppa:savoury1/backports
 add-apt-repository -yn ppa:savoury1/display
 add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -104,7 +102,6 @@ export CXXFLAGS='-s'
 ldconfig
 SELF_DIR="$(dirname "$(readlink -f "${0}")")"
 echo $SELF_DIR
-
 retry() {
   # max retry 5 times
   try=5
@@ -131,8 +128,6 @@ join_by() {
   shift
   printf "%s" "$first" "${@/#/$separator}"
 }
-
-
 
 # install cmake and ninja-build
 if ! which cmake &>/dev/null; then
@@ -343,64 +338,145 @@ cmake \
 cmake --build build
 rm -fr /tmp/qbee/
 cmake --install build
+
 # build AppImage
-linuxdeploy_qt_download_url="https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+linuxdeploy_qt_download_url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
   linuxdeploy_qt_download_url="https://ghproxy.com/${linuxdeploy_qt_download_url}"
 fi
-[ -x "/tmp/linuxdeploy-plugin-qt-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeploy-plugin-qt-x86_64.AppImage "${linuxdeploy_qt_download_url}"
-chmod -v +x '/tmp/linuxdeploy-plugin-qt-x86_64.AppImage'
-
-linuxdeploy_qt2_download_url="https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20220822-1/linuxdeploy-x86_64.AppImage"
-if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
-  linuxdeploy_qt2_download_url="https://ghproxy.com/${linuxdeploy_qt2_download_url}"
-fi
-[ -x "/tmp/linuxdeploy-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeploy-x86_64.AppImage "${linuxdeploy_qt2_download_url}"
-chmod -v +x '/tmp/linuxdeploy-x86_64.AppImage'
-
-
-
+[ -x "/tmp/linuxdeployqt-continuous-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeployqt-continuous-x86_64.AppImage "${linuxdeploy_qt_download_url}"
+chmod -v +x '/tmp/linuxdeployqt-continuous-x86_64.AppImage'
 cd "/tmp/qbee"
 ln -svf usr/share/icons/hicolor/scalable/apps/qbittorrent.svg /tmp/qbee/AppDir/
 ln -svf qbittorrent.svg /tmp/qbee/AppDir/.DirIcon
-mkdir -p "/tmp/qbee/AppDir/apprun-hooks/"
-cat >/tmp/qbee/AppDir/apprun-hooks/setup_env.sh <<EOF
-# this file is called from AppRun so 'root_dir' will point to where AppRun is
-root_dir="$(readlink -f "$(dirname "$0")")"
-
-# Insert the default values because after the test we prepend our path
-# and it will create problems with DEs (eg KDE) that don't set the variable
-# and rely on the default paths
-if [[ -z ${XDG_DATA_DIRS} ]]; then
-    XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
-fi
-
-export XDG_DATA_DIRS="${root_dir}/usr/share:${XDG_DATA_DIRS}"
-
-case "${QT_QPA_PLATFORMTHEME}" in
-    *gtk2*)
-        export QT_QPA_PLATFORMTHEME=qt6gtk2
-        ;;
-
-        *)
-        export QT_QPA_PLATFORMTHEME=gtk3
-        ;;
-esac
-
-case "${QT_STYLE_OVERRIDE}" in
-    *gtk2*)
-        export QT_QPA_PLATFORMTHEME=qt6gtk2
-        unset QT_STYLE_OVERRIDE
-        ;;
-esac
-
+cat >/tmp/qbee/AppDir/AppRun <<EOF
+#!/bin/bash -e
+this_dir="\$(readlink -f "\$(dirname "\$0")")"
+#export XDG_DATA_DIRS="\${this_dir}/usr/share:\${XDG_DATA_DIRS}:/usr/share:/usr/local/share"
+#export QT_QPA_PLATFORMTHEMES=gtk2
+#export QT_STYLE_OVERRIDE=qt6gtk2
+# Find the system certificates location
+# https://gitlab.com/probono/platformissues/blob/master/README.md#certificates
+possible_locations=(
+  "/etc/ssl/certs/ca-certificates.crt"                # Debian/Ubuntu/Gentoo etc.
+  "/etc/pki/tls/certs/ca-bundle.crt"                  # Fedora/RHEL
+  "/etc/ssl/ca-bundle.pem"                            # OpenSUSE
+  "/etc/pki/tls/cacert.pem"                           # OpenELEC
+  "/etc/ssl/certs"                                    # SLES10/SLES11, https://golang.org/issue/12139
+  "/usr/share/ca-certs/.prebuilt-store/"              # Clear Linux OS; https://github.com/knapsu/plex-media-player-appimage/issues/17#issuecomment-437710032
+  "/system/etc/security/cacerts"                      # Android
+  "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem" # CentOS/RHEL 7
+  "/etc/ssl/cert.pem"                                 # Alpine Linux
+)
+for location in "\${possible_locations[@]}"; do
+  if [ -r "\${location}" ]; then
+    export SSL_CERT_FILE="\${location}"
+    break
+  fi
+done
+exec "\${this_dir}/usr/bin/qbittorrent" "\$@"
 EOF
+chmod 755 -v /tmp/qbee/AppDir/AppRun
 
-ls -al /tmp
-ls -al /tmp/qbee
-cd "/tmp/qbee"
+#
+#  xcbglintegrations
+extra_plugins=(
+  iconengines
+  imageformats
+  platforminputcontexts
+  platformthemes
+  styles
+  platforms
+  sqldrivers
+  tls
+)
+exclude_libs=(
+  libatk-1.0.so.0
+  libatk-bridge-2.0.so.0
+  libatspi.so.0
+  libblkid.so.1
+  libboost_filesystem.so.1.58.0
+  libboost_system.so.1.58.0
+  libboost_system.so.1.65.1
+#  libbsd.so.0
+  libcairo-gobject.so.2
+  libcairo.so.2
+  libcapnp-0.5.3.so
+  libcapnp-0.6.1.so
+  libdatrie.so.1
+#  libdbus-1.so.3
+  libepoxy.so.0
+  libffi.so.6
+#  libgcrypt.so.20
+  libgdk-3.so.0
+  libgdk_pixbuf-2.0.so.0
+  libgdk-x11-2.0.so.0
+  libgio-2.0.so.0
+  libglib-2.0.so.0
+  libgmodule-2.0.so.0
+  libgobject-2.0.so.0
+  libgraphite2.so.3
+  #libgtk-3.so.0
+  libgtk-x11-2.0.so.0
+  libkj-0.5.3.so
+  libkj-0.6.1.so
+  libmirclient.so.9
+  libmircommon.so.7
+  libmircore.so.1
+  libmirprotobuf.so.3
+  libmount.so.1
+  libpango-1.0.so.0
+  libpangocairo-1.0.so.0
+  libpangoft2-1.0.so.0
+  libpixman-1.so.0
+  libprotobuf-lite.so.9
+  libselinux.so.1
+  libsystemd.so.0
+  libwayland-client.so.0
+  libwayland-cursor.so.0
+  libwayland-egl.so.1
+  libwayland-server.so.0
+#  libX11-xcb.so.1
+  libXau.so.6
+#  libxcb-glx.so.0
+#  libxcb-icccm.so.4
+#  libxcb-image.so.0
+#  libxcb-keysyms.so.1
+#  libxcb-randr.so.0
+#  libxcb-render.so.0
+#  libxcb-render-util.so.0
+#  libxcb-shape.so.0
+#  libxcb-shm.so.0
+#  libxcb-sync.so.1
+#  libxcb-util.so.1
+#  libxcb-xfixes.so.0
+#  libxcb-xkb.so.1
+  libXcomposite.so.1
+  libXcursor.so.1
+  libXdamage.so.1
+  libXdmcp.so.6
+  libXext.so.6
+  libXfixes.so.3
+  libXinerama.so.1
+  libXi.so.6
+  libxkbcommon.so.0
+  libxkbcommon-x11.so.0
+  libXrandr.so.2
+  libXrender.so.1
+)
+
+# fix AppImage output file name
+sed -i 's/Name=qBittorrent.*/Name=qBittorrent/;/SingleMainWindow/d' /tmp/qbee/AppDir/usr/share/applications/*.desktop
+
 APPIMAGE_EXTRACT_AND_RUN=1 \
-  OUTPUT='qBittorrent-x86_64.AppImage' \
-  /tmp/linuxdeploy-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --output=appimage  --plugin qt
+  /tmp/linuxdeployqt-continuous-x86_64.AppImage \
+  /tmp/qbee/AppDir/usr/share/applications/*.desktop \
+  -always-overwrite \
+  -appimage \
+  -no-copy-copyright-files \
+  -updateinformation="zsync|https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/qBittorrent-x86_64.AppImage.zsync" \
+  -extra-plugins="$(join_by ',' "${extra_plugins[@]}")" \
+  -exclude-libs="$(join_by ',' "${exclude_libs[@]}")"
 
+# output file name should be qBittorrent-Enhanced-Edition-x86_64.AppImage
 cp -fv /tmp/qbee/qBittorrent*.AppImage* "${SELF_DIR}/"

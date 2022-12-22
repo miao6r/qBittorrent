@@ -61,11 +61,19 @@ void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &origi
     };
     QString category;
     Path usedPath = savePath;
+    QHash<QString, bool> visited;
     for(const QString c:categoryPaths.keys()) {
         Path p = categoryPaths[c];
+        QString ps = p.toString();
+        if(visited.contains(ps)) {
+            continue;
+        }
+        visited[ps] = true;
         PathList searchList;
         searchList.append(originalFileNames.first());
-        searchList.append(originalFileNames.last());
+        if(originalFileNames.length()>1) {
+            searchList.append(originalFileNames.last());
+        }
         const bool found = findInDir(p, searchList, false);
         if(found) {
             category = c;

@@ -41,8 +41,6 @@ echo '/usr/local/lib/x86_64-linux-gnu' >/etc/ld.so.conf.d/x86_64-linux-gnu-local
 apt update
 apt install -y software-properties-common apt-transport-https
 
-apt-add-repository -yn ppa:savoury1/backports
-add-apt-repository -yn ppa:savoury1/display
 add-apt-repository ppa:ubuntu-toolchain-r/test
 
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
@@ -90,15 +88,15 @@ apt install -y \
   libxcb-xkb-dev \
   libxkbcommon-dev \
   libxkbcommon-x11-dev \
-  gcc-8 \
-  g++-8
+  gcc-11 \
+  g++-11
 
 #  libwayland-dev \
 #  libwayland-egl-backend-dev \
 
 apt autoremove --purge -y
 # make gcc-8 as default gcc
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 800 --slave /usr/bin/g++ g++ /usr/bin/g++-11
 # strip all compiled files by default
 export CFLAGS='-s'
 export CXXFLAGS='-s'
@@ -338,7 +336,6 @@ cmake \
   -B build \
   -G "Ninja" \
   -DQT6=ON \
-  -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs" \
   -DCMAKE_PREFIX_PATH="${QT_BASE_DIR}/lib/cmake/" \
   -DCMAKE_BUILD_TYPE="Release" \
   -DCMAKE_CXX_STANDARD="17" \

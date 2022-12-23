@@ -650,7 +650,7 @@ QPair<qint64,qint64> *TransferListModel::getTorrentsSize()
         }
         return m_total;
     } catch (std::exception e) {
-        qWarning() << "Exception: " << x << " " << e.what()
+        qWarning() << "Exception: " << x << " " << e.what();
     }
     return nullptr;
 }

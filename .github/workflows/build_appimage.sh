@@ -202,10 +202,10 @@ rm -fr CMakeCache.txt CMakeFiles
 #  -no-feature-testlib \
 #  -no-feature-vnc \
 #  -feature-optimize_full \
+#  -xcb
+#  -gtk
 ./configure \
   -ltcg \
-  -xcb \
-  -gtk \
   -openssl-linked \
   -qt-libjpeg \
   -qt-libpng \

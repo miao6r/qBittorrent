@@ -32,6 +32,9 @@
 
 #include <QHash>
 #include <QVector>
+#include <QThread>
+#include <QFuture>
+#include <QFutureWatcher>
 #include "base/bittorrent/session.h"
 #include "base/bittorrent/torrent.h"
 #include "base/bittorrent/trackerentry.h"
@@ -47,16 +50,27 @@ FileSearchEntriesDialog::FileSearchEntriesDialog(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, [this](QAbstractButton *button){
+        if (button->text().contains(u"Abort"_qs)) {
+            m_watcher->cancel();
+        } else {
+            this->close();
+        }
+    });
 
+    m_watcher = new QFutureWatcher<QString>;
+    m_watcher->setPendingResultsLimit(10);
+    connect(m_watcher, &QFutureWatcherBase::resultsReadyAt, this, &FileSearchEntriesDialog::updateResults);
     loadSettings();
 }
 
 FileSearchEntriesDialog::~FileSearchEntriesDialog()
 {
     saveSettings();
-
+    if(m_watcher) {
+        m_watcher->cancel();
+        m_watcher->deleteLater();
+    }
     delete m_ui;
 }
 
@@ -66,43 +80,53 @@ void FileSearchEntriesDialog::appendText(const QString &text)
     m_ui->plainTextEdit->appendPlainText(text);
 }
 
-void FileSearchEntriesDialog::search(const QVector<BitTorrent::Torrent *> &torrents) {
+extern void searchFn(QPromise<QString> &promise, const QVector<BitTorrent::Torrent *> &torrents) {
     if (!torrents.empty())
     {
         int i =0 ;
         BitTorrent::Session* s = BitTorrent::Session::instance();
         for (const BitTorrent::Torrent *torrent : torrents)
         {
-            appendText(u"Torrent: %1\nSave Path: %2\nActual Storage: %3\nSearching: %4"_qs
-                                               .replace(u"%1"_qs,torrent->name())
-                                               .replace(u"%2"_qs,torrent->savePath().toString())
-                                               .replace(u"%3"_qs,torrent->actualStorageLocation().toString())
-                                               .replace(u"%4"_qs,torrent->filePaths().first().toString()));
+            if(promise.isCanceled()) {
+                return;
+            }
+            promise.addResult(u"Torrent: %1\nSave Path: %2\nActual Storage: %3\nSearching: %4"_qs
+                                       .replace(u"%1"_qs,torrent->name())
+                                       .replace(u"%2"_qs,torrent->savePath().toString())
+                                       .replace(u"%3"_qs,torrent->actualStorageLocation().toString())
+                                       .replace(u"%4"_qs,torrent->filePaths().first().toString()));
             Path filePath = torrent->filePaths().first();
+            sleep(10);
             //s->categories();
             QList<Path> visited;
             for(QString &category : s->categories()) {
+                if(promise.isCanceled()) {
+                    return;
+                }
                 Path cpath = s->categorySavePath(category);
                 if(visited.contains(cpath)){
-                    appendText(category + u" skipped"_qs);
+                    promise.addResult(category + u" skipped"_qs);
                     continue;
                 } else {
                     visited.append(cpath);
                 }
                 Path cpp = (cpath/filePath);
                 if (cpp.exists()) {
-                    appendText(u" >>>Found: Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpp.toString()));
+                    promise.addResult(u" >>>Found: Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpp.toString()));
                 } else {
-                    appendText(u" ---Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpath.toString()));
+                    promise.addResult(u" ---Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpath.toString()));
                 }
             }
             i++;
-            if  (i>10) {
-                appendText(u"Too many torrents, rest ignored."_qs);
+            if (i>50) {
+                promise.addResult(u"Too many torrents, rest ignored."_qs);
             }
         }
     }
+}
 
+void FileSearchEntriesDialog::search(const QVector<BitTorrent::Torrent *> &torrents) {
+    m_watcher->setFuture(QtConcurrent::run(searchFn, torrents));
 }
 
 void FileSearchEntriesDialog::setText(const QString &text)
@@ -125,3 +149,12 @@ void FileSearchEntriesDialog::loadSettings()
     if (const QSize dialogSize = m_storeDialogSize; dialogSize.isValid())
         resize(dialogSize);
 }
+
+void FileSearchEntriesDialog::updateResults(int begin, int end)
+{
+    for(int i = begin;i<end;i++) {
+        appendText(m_watcher->resultAt(i));
+    }
+}
+
+

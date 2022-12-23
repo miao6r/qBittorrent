@@ -30,14 +30,11 @@
 
 #include <QDialog>
 #include <QtContainerFwd>
+#include <QtConcurrent/QtConcurrent>
 
 #include "base/settingvalue.h"
 #include "base/bittorrent/torrent.h"
 
-namespace BitTorrent
-{
-    struct TrackerEntry;
-}
 
 namespace Ui
 {
@@ -58,10 +55,14 @@ public:
     void appendText(const QString &text);
     QString text() const;
 
+private slots:
+    void updateResults(int begin, int end);
+
 private:
     void saveSettings();
     void loadSettings();
 
     Ui::FileSearchEntriesDialog *m_ui = nullptr;
     SettingValue<QSize> m_storeDialogSize;
+    QFutureWatcher<QString> *m_watcher = nullptr;
 };

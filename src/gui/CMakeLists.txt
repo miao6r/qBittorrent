@@ -210,7 +210,10 @@ add_library(qbt_gui STATIC
     watchedfolderoptionsdialog.cpp
     watchedfoldersmodel.cpp
     filesearchentriesdialog.h
-    filesearchentriesdialog.cpp)
+    filesearchentriesdialog.cpp
+    # generated .ui headers
+    ${UI_HEADERS}
+)
 
 target_sources(qbt_gui INTERFACE about.qrc)
 

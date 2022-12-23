@@ -443,7 +443,7 @@ namespace BitTorrent
         void handleIPFilterParsed(int ruleCount);
         void handleIPFilterError();
         void handleDownloadFinished(const Net::DownloadResult &result);
-        void fileSearchFinished(const TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category);
+        void fileSearchFinished(const TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category, const bool skipChecking);
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         // Session reconfiguration triggers
@@ -707,7 +707,7 @@ namespace BitTorrent
         QSet<TorrentID> m_needSaveResumeDataTorrents;
         QHash<TorrentID, TorrentID> m_changedTorrentIDs;
         QMap<QString, CategoryOptions> m_categories;
-        QMap<QString, Path> m_categoryPaths;
+        QList<QPair<QString, Path>> m_categoryPaths;
         QSet<QString> m_tags;
 
         QHash<Torrent *, QSet<QString>> m_updatedTrackerEntries;

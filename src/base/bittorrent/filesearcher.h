@@ -48,8 +48,8 @@ public:
 
 public slots:
     void search(const BitTorrent::TorrentID &id, const PathList &originalFileNames
-                , const Path &savePath, const Path &downloadPath, bool forceAppendExt, const QMap<QString, Path> &categoryPaths);
+                , const Path &savePath, const Path &downloadPath, bool forceAppendExt, const bool skipChecking, const QList<QPair<QString, Path>> *categoryPaths);
 
 signals:
-    void searchFinished(const BitTorrent::TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category);
+    void searchFinished(const BitTorrent::TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category, const bool skipChecking);
 };

@@ -202,10 +202,10 @@ rm -fr CMakeCache.txt CMakeFiles
 #  -no-feature-testlib \
 #  -no-feature-vnc \
 #  -feature-optimize_full \
-#  -xcb
-#  -gtk
 ./configure \
   -ltcg \
+  -xcb \
+  -gtk \
   -openssl-linked \
   -qt-libjpeg \
   -qt-libpng \
@@ -400,8 +400,8 @@ esac
 EOF
 
 cd "/tmp/qbee"
-export EXTRA_QT_PLUGINS="styles;iconengines"
-export DEPLOY_PLATFORM_THEMES=1
+#export EXTRA_QT_PLUGINS="styles;iconengines"
+#export DEPLOY_PLATFORM_THEMES=1
 export DEBUG=1
 #APPIMAGE_EXTRACT_AND_RUN=1  \
 #  OUTPUT='qBittorrent-x86_64-qt.AppImage' \

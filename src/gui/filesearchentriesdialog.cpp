@@ -96,8 +96,6 @@ extern void searchFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                                        .replace(u"%3"_qs,torrent->actualStorageLocation().toString())
                                        .replace(u"%4"_qs,torrent->filePaths().first().toString()));
             Path filePath = torrent->filePaths().first();
-            sleep(10);
-            //s->categories();
             QList<Path> visited;
             for(QString &category : s->categories()) {
                 if(promise.isCanceled()) {

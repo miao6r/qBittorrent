@@ -37,6 +37,7 @@ qt_wrap_ui(UI_HEADERS
     torrentcreatordialog.ui
     torrentoptionsdialog.ui
     trackerentriesdialog.ui
+    filesearchentriesdialog.ui
     watchedfolderoptionsdialog.ui
 )
 
@@ -208,10 +209,8 @@ add_library(qbt_gui STATIC
     utils.cpp
     watchedfolderoptionsdialog.cpp
     watchedfoldersmodel.cpp
-
-    # generated .ui headers
-    ${UI_HEADERS}
-)
+    filesearchentriesdialog.h
+    filesearchentriesdialog.cpp)
 
 target_sources(qbt_gui INTERFACE about.qrc)
 

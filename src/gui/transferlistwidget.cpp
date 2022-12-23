@@ -43,7 +43,6 @@
 #include <QWheelEvent>
 
 #include "base/bittorrent/session.h"
-#include "base/bittorrent/torrent.h"
 #include "base/bittorrent/trackerentry.h"
 #include "base/global.h"
 #include "base/logger.h"
@@ -63,6 +62,7 @@
 #include "torrentcategorydialog.h"
 #include "torrentoptionsdialog.h"
 #include "trackerentriesdialog.h"
+#include "filesearchentriesdialog.h"
 #include "transferlistdelegate.h"
 #include "transferlistmodel.h"
 #include "transferlistsortmodel.h"
@@ -781,6 +781,26 @@ void TransferListWidget::askAddTagsForSelection()
         addSelectionTag(tag);
 }
 
+void TransferListWidget::searchTorrentFiles()
+{
+    const QVector<BitTorrent::Torrent *> torrents = getSelectedTorrents();
+    auto searcherDialog = new FileSearchEntriesDialog(this);
+    searcherDialog->setAttribute(Qt::WA_DeleteOnClose);
+    searcherDialog->setText(u""_qs);
+    connect(searcherDialog, &QDialog::accepted, this, [torrents, searcherDialog]()
+    {
+        searcherDialog->close();
+    });
+    connect(searcherDialog, &QDialog::close, this, [torrents, searcherDialog]()
+    {
+        qWarning() << "search dialog closed";
+    });
+    searcherDialog->search(torrents);
+
+    searcherDialog->open();
+}
+
+
 void TransferListWidget::editTorrentTrackers()
 {
     const QVector<BitTorrent::Torrent *> torrents = getSelectedTorrents();
@@ -1024,6 +1044,8 @@ void TransferListWidget::displayListMenu()
     connect(actionAutoTMM, &QAction::triggered, this, &TransferListWidget::setSelectedAutoTMMEnabled);
     auto *actionEditTracker = new QAction(UIThemeManager::instance()->getIcon(u"edit-rename"_qs), tr("Edit trac&kers..."), listMenu);
     connect(actionEditTracker, &QAction::triggered, this, &TransferListWidget::editTorrentTrackers);
+    auto *actionSearchFiles = new QAction(UIThemeManager::instance()->getIcon(u"set-location"_qs), tr("Search &files..."), listMenu);
+    connect(actionSearchFiles, &QAction::triggered, this, &TransferListWidget::searchTorrentFiles);
     auto *actionExportTorrent = new QAction(UIThemeManager::instance()->getIcon(u"edit-copy"_qs), tr("E&xport .torrent..."), listMenu);
     connect(actionExportTorrent, &QAction::triggered, this, &TransferListWidget::exportTorrent);
     // End of actions
@@ -1162,8 +1184,10 @@ void TransferListWidget::displayListMenu()
     listMenu->addAction(actionDelete);
     listMenu->addSeparator();
     listMenu->addAction(actionSetTorrentPath);
-    if (selectedIndexes.size() == 1)
+    if (selectedIndexes.size() == 1){
         listMenu->addAction(actionRename);
+    }
+    listMenu->addAction(actionSearchFiles);
     listMenu->addAction(actionEditTracker);
 
     // Category Menu

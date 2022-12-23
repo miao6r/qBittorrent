@@ -126,6 +126,7 @@ private:
     QVector<BitTorrent::Torrent *> getSelectedTorrents() const;
     void askAddTagsForSelection();
     void editTorrentTrackers();
+    void searchTorrentFiles();
     void exportTorrent();
     void confirmRemoveAllTagsForSelection();
     QStringList askTagsForSelection(const QString &dialogTitle);

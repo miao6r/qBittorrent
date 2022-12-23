@@ -420,6 +420,28 @@ cd "/tmp/qbee"
 cat >/tmp/qbee/AppDir/AppRun <<EOF
 #!/bin/bash -e
 this_dir="\$(readlink -f "\$(dirname "\$0")")"
+if [[ -z \${XDG_DATA_DIRS} ]]; then
+    XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
+fi
+
+export XDG_DATA_DIRS="\${this_dir}/usr/share:\${XDG_DATA_DIRS}"
+case "\${QT_QPA_PLATFORMTHEME}" in
+    *gtk2*)
+        export QT_QPA_PLATFORMTHEME=qt6gtk2
+        ;;
+
+        *)
+        export QT_QPA_PLATFORMTHEME=gtk3
+        ;;
+esac
+
+case "\${QT_STYLE_OVERRIDE}" in
+    *gtk2*)
+        export QT_QPA_PLATFORMTHEME=qt6gtk2
+        unset QT_STYLE_OVERRIDE
+        ;;
+esac
+
 # Find the system certificates location
 # https://gitlab.com/probono/platformissues/blob/master/README.md#certificates
 possible_locations=(

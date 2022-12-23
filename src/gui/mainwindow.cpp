@@ -503,8 +503,11 @@ bool MainWindow::isDownloadTrackerFavicon() const
 
 void MainWindow::updateTotalTorrentsSize()
 {
-    QPair<qint64,qint64>* tPair = m_transferListWidget->getSourceModel()->getTorrentsSize();
-    m_statusBar->updateTorrentsSize(nullptr,nullptr,tPair);
+    TransferListModel * tm =m_transferListWidget->getSourceModel();
+    if (tm) {
+        QPair<qint64,qint64>* tPair = tm->getTorrentsSize();
+        m_statusBar->updateTorrentsSize(nullptr,nullptr,tPair);
+    }
 }
 
 

@@ -126,7 +126,10 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
             if(promise.isCanceled()) {
                 break;
             }
-
+            for(const QString &category:foundCategories) {
+                Path  p=  s->categorySavePath(category);
+                torrent->addTag(p.toString().replace(u"/"_qs,u"I"_qs));
+            }
             if(foundCategories.size()==1) {
                 if (fixPath) {
                     bool fixCategory = false;
@@ -149,12 +152,7 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                         skipped++;
                     }
                 }
-                torrent->addTag(torrent->savePath().toString().replace(u"/"_qs,u"I"_qs));
             } else if(foundCategories.size()>1) {
-                for(const QString &category:foundCategories) {
-                    Path  p=  s->categorySavePath(category);
-                    torrent->addTag(p.toString().replace(u"/"_qs,u"I"_qs));
-                }
                 torrent->addTag(u"multiPaths"_qs);
                 promise.addResult(u"Error: found in multiple categories."_qs);
                 error++;

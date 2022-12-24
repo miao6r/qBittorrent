@@ -2153,7 +2153,6 @@ void SessionImpl::handleDownloadFinished(const Net::DownloadResult &result)
 void SessionImpl::fileSearchFinished(const TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category, const bool skipChecking)
 {
     TorrentImpl *torrent = m_torrents.value(id);
-    LogMsg(tr("%1 Save Path: \"%2\"").arg(torrent->name()).arg(savePath.toString()));
     if (torrent)
     {
         torrent->fileSearchFinished(savePath, fileNames);
@@ -2168,6 +2167,7 @@ void SessionImpl::fileSearchFinished(const TorrentID &id, const Path &savePath, 
         if(!category.isEmpty()) {
             params.category= category;
         }
+        LogMsg(tr("%1 Save Path: \"%2\"").arg(params.name).arg(savePath.toString()));
         // set seed_mode flag
         if (skipChecking)
             p.flags |= lt::torrent_flags::seed_mode;

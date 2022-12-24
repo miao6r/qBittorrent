@@ -87,6 +87,7 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
         int i =0 ;
         int fixed =0;
         int skipped =0;
+        int error = 0;
         int total = torrents.size();
         BitTorrent::Session* s = BitTorrent::Session::instance();
         for (BitTorrent::Torrent *torrent : torrents)
@@ -126,7 +127,7 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                 break;
             }
 
-            if(fixPath && foundCategories.size()==1 ) {
+            if(fixPath && foundCategories.size()==1) {
                 bool fixCategory = false;
                 bool fixSavePath = false;
                 if(torrent->category()!=foundCategories.first()) {
@@ -147,7 +148,9 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                     skipped++;
                 }
             } else if(foundCategories.size()>1) {
+                torrent->addTag(u"path_error"_qs);
                 promise.addResult(u"Error: found in multiple categories."_qs);
+                error++;
             } else if(foundCategories.isEmpty()){
                 promise.addResult(u"No matched category."_qs);
             }
@@ -155,11 +158,12 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
             promise.addResult(u"--"_qs);
             i++;
         }
-        promise.addResult(u"===================\n %1 processed, %2 fixed, %3 skipped, %4 total"_qs
+        promise.addResult(u"===================\n %1 processed, %2 fixed, %3 skipped, %4 error, %5 total"_qs
                                   .replace(u"%1"_qs,QString::number(i))
                                   .replace(u"%2"_qs,QString::number(fixed))
                                   .replace(u"%3"_qs,QString::number(skipped))
-                                  .replace(u"%4"_qs,QString::number(total)));
+                                  .replace(u"%4"_qs,QString::number(error))
+                                  .replace(u"%5"_qs,QString::number(total)));
     }
 }
 

@@ -127,31 +127,39 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                 break;
             }
 
-            if(fixPath && foundCategories.size()==1) {
-                bool fixCategory = false;
-                bool fixSavePath = false;
-                if(torrent->category()!=foundCategories.first()) {
-                    fixCategory = true;
+            if(foundCategories.size()==1) {
+                if (fixPath) {
+                    bool fixCategory = false;
+                    bool fixSavePath = false;
+                    if(torrent->category()!=foundCategories.first()) {
+                        fixCategory = true;
+                    }
+                    Path categorySavePath =  s->categorySavePath(foundCategories.first());
+                    if( categorySavePath!= torrent->savePath()){
+                        fixSavePath = true;
+                    }
+                    if(fixCategory || fixSavePath){
+                        torrent->setAutoTMMEnabled(false);
+                        torrent->setSavePath(categorySavePath);
+                        torrent->setCategory(foundCategories.first());
+                        promise.addResult(u"Success: fixed path and category."_qs);
+                        fixed++;
+                    } else {
+                        promise.addResult(u"Skipped: torrent is correct."_qs);
+                        skipped++;
+                    }
                 }
-                Path categorySavePath =  s->categorySavePath(foundCategories.first());
-                if( categorySavePath!= torrent->savePath()){
-                    fixSavePath = true;
-                }
-                if(fixCategory || fixSavePath){
-                    torrent->setAutoTMMEnabled(false);
-                    torrent->setSavePath(categorySavePath);
-                    torrent->setCategory(foundCategories.first());
-                    promise.addResult(u"Success: fixed path and category."_qs);
-                    fixed++;
-                } else {
-                    promise.addResult(u"Skipped: torrent is correct."_qs);
-                    skipped++;
-                }
+                torrent->addTag(torrent->savePath().toString().replace(u"/"_qs,u"I"_qs));
             } else if(foundCategories.size()>1) {
-                torrent->addTag(u"path_error"_qs);
+                for(const QString &category:foundCategories) {
+                    Path  p=  s->categorySavePath(category);
+                    torrent->addTag(p.toString().replace(u"/"_qs,u"I"_qs));
+                }
+                torrent->addTag(u"multiPaths"_qs);
                 promise.addResult(u"Error: found in multiple categories."_qs);
                 error++;
             } else if(foundCategories.isEmpty()){
+                torrent->addTag(torrent->savePath().toString().replace(u"/"_qs,u"I"_qs));
                 promise.addResult(u"No matched category."_qs);
             }
 

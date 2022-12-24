@@ -94,13 +94,14 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
             if(promise.isCanceled()) {
                 break;
             }
-            promise.addResult(u"(%5/%6)Torrent: %1\nSave Path: %2\nActual Storage: %3\nSearching: %4"_qs
+            promise.addResult(u"(%5/%6)Torrent: %1\nCategory: %7\nSave Path: %2\nActual Storage: %3\nSearching: %4"_qs
                                        .replace(u"%1"_qs,torrent->name())
                                        .replace(u"%2"_qs,torrent->savePath().toString())
                                        .replace(u"%3"_qs,torrent->actualStorageLocation().toString())
                                        .replace(u"%4"_qs,torrent->filePaths().first().toString())
                                        .replace(u"%5"_qs,QString::number(i+1))
-                                       .replace(u"%6"_qs,QString::number(total)));
+                                       .replace(u"%6"_qs,QString::number(total))
+                                       .replace(u"%"_qs,torrent->category()));
             Path filePath = torrent->filePaths().first();
             QList<Path> visited;
             QList<QString> foundCategories;

@@ -2153,6 +2153,7 @@ void SessionImpl::handleDownloadFinished(const Net::DownloadResult &result)
 void SessionImpl::fileSearchFinished(const TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category, const bool skipChecking)
 {
     TorrentImpl *torrent = m_torrents.value(id);
+    LogMsg(tr("%1 Save Path: \"%2\"").arg(torrent->name()).arg(savePath.toString()));
     if (torrent)
     {
         torrent->fileSearchFinished(savePath, fileNames);

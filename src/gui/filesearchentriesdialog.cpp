@@ -125,32 +125,32 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                 break;
             }
 
-                if(fixPath && foundCategories.size()==1 ) {
-                    bool fixCategory = false;
-                    bool fixSavePath = false;
-                    if(torrent->category()!=foundCategories.first()) {
-                        fixCategory = true;
-                    }
-                    Path categorySavePath =  s->categorySavePath(foundCategories.first());
-                    if( categorySavePath!= torrent->savePath()){
-                        fixSavePath = true;
-                    }
-                    if(fixCategory || fixSavePath){
-                        torrent->setAutoTMMEnabled(false);
-                        torrent->setSavePath(categorySavePath);
-                        torrent->setCategory(foundCategories.first());
-                        promise.addResult(u"Success: fixed path and category."_qs);
-                        fixed++;
-                    } else {
-                        promise.addResult(u"Skipped: torrent is correct."_qs);
-                        skipped++;
-                    }
-                } else if(foundCategories.size()>1) {
-                    promise.addResult(u"Error: found in multiple categories."_qs);
-                } else if(foundCategories.isEmpty()){
-                    promise.addResult(u"No matched category."_qs);
+            if(fixPath && foundCategories.size()==1 ) {
+                bool fixCategory = false;
+                bool fixSavePath = false;
+                if(torrent->category()!=foundCategories.first()) {
+                    fixCategory = true;
                 }
+                Path categorySavePath =  s->categorySavePath(foundCategories.first());
+                if( categorySavePath!= torrent->savePath()){
+                    fixSavePath = true;
+                }
+                if(fixCategory || fixSavePath){
+                    torrent->setAutoTMMEnabled(false);
+                    torrent->setSavePath(categorySavePath);
+                    torrent->setCategory(foundCategories.first());
+                    promise.addResult(u"Success: fixed path and category."_qs);
+                    fixed++;
+                } else {
+                    promise.addResult(u"Skipped: torrent is correct."_qs);
+                    skipped++;
+                }
+            } else if(foundCategories.size()>1) {
+                promise.addResult(u"Error: found in multiple categories."_qs);
+            } else if(foundCategories.isEmpty()){
+                promise.addResult(u"No matched category."_qs);
             }
+
             promise.addResult(u"--"_qs);
             i++;
         }

@@ -50,13 +50,14 @@ FileSearchEntriesDialog::FileSearchEntriesDialog(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->buttonBox, &QDialogButtonBox::clicked, this, [this](QAbstractButton *button){
-        if (button->text().contains(u"Abort"_qs)) {
-            m_watcher->cancel();
-        } else {
-            this->close();
-        }
+    connect(m_ui->abortButton, &QPushButton::clicked, this, [this](){
+        m_watcher->cancel();
     });
+    connect(m_ui->closeButton, &QPushButton::clicked, this, [this](){
+        this->close();
+    });
+    connect(m_ui->searchButton, &QPushButton::clicked, this, &FileSearchEntriesDialog::searchFiles);
+    connect(m_ui->fixButton, &QPushButton::clicked, this, &FileSearchEntriesDialog::fixPaths);
 
     m_watcher = new QFutureWatcher<QString>;
     m_watcher->setPendingResultsLimit(10);
@@ -80,26 +81,32 @@ void FileSearchEntriesDialog::appendText(const QString &text)
     m_ui->plainTextEdit->appendPlainText(text);
 }
 
-extern void searchFn(QPromise<QString> &promise, const QVector<BitTorrent::Torrent *> &torrents) {
+extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torrent *> &torrents, const bool fixPath) {
     if (!torrents.empty())
     {
         int i =0 ;
+        int fixed =0;
+        int skipped =0;
+        int total = torrents.size();
         BitTorrent::Session* s = BitTorrent::Session::instance();
-        for (const BitTorrent::Torrent *torrent : torrents)
+        for (BitTorrent::Torrent *torrent : torrents)
         {
             if(promise.isCanceled()) {
-                return;
+                break;
             }
-            promise.addResult(u"Torrent: %1\nSave Path: %2\nActual Storage: %3\nSearching: %4"_qs
+            promise.addResult(u"(%5/%6)Torrent: %1\nSave Path: %2\nActual Storage: %3\nSearching: %4"_qs
                                        .replace(u"%1"_qs,torrent->name())
                                        .replace(u"%2"_qs,torrent->savePath().toString())
                                        .replace(u"%3"_qs,torrent->actualStorageLocation().toString())
-                                       .replace(u"%4"_qs,torrent->filePaths().first().toString()));
+                                       .replace(u"%4"_qs,torrent->filePaths().first().toString())
+                                       .replace(u"%5"_qs,QString::number(i+1))
+                                       .replace(u"%6"_qs,QString::number(total)));
             Path filePath = torrent->filePaths().first();
             QList<Path> visited;
+            QList<QString> foundCategories;
             for(QString &category : s->categories()) {
                 if(promise.isCanceled()) {
-                    return;
+                   break;
                 }
                 Path cpath = s->categorySavePath(category);
                 if(visited.contains(cpath)){
@@ -110,21 +117,69 @@ extern void searchFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                 }
                 Path cpp = (cpath/filePath);
                 if (cpp.exists()) {
-                    promise.addResult(u" >>>Found: Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpp.toString()));
-                } else {
-                    promise.addResult(u" ---Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpath.toString()));
+                    foundCategories.append(category);
+                    promise.addResult(u">>>Found in Category: %1 Path: %2"_qs.replace(u"%1"_qs, category).replace(u"%2"_qs, cpp.toString()));
                 }
             }
-            i++;
-            if (i>50) {
-                promise.addResult(u"Too many torrents, rest ignored."_qs);
+            if(promise.isCanceled()) {
+                break;
             }
+            if(fixPath) {
+                if(foundCategories.size()==1) {
+                    bool fixCategory = false;
+                    bool fixSavePath = false;
+                    if(torrent->category()!=foundCategories.first()) {
+                        fixCategory = true;
+                    }
+                    Path categorySavePath =  s->categorySavePath(foundCategories.first());
+                    if( categorySavePath!= torrent->savePath()){
+                        fixSavePath = true;
+                    }
+                    if(fixCategory || fixSavePath){
+                        torrent->setAutoTMMEnabled(false);
+                        torrent->setSavePath(categorySavePath);
+                        torrent->setCategory(foundCategories.first());
+                        promise.addResult(u"Success: fixed path and category."_qs);
+                        fixed++;
+                    } else {
+                        promise.addResult(u"Skipped: torrent is correct."_qs);
+                        skipped++;
+                    }
+                } else {
+                    promise.addResult(u"Error: found in multiple categories, skipped."_qs);
+                }
+            } else {
+                skipped++;
+            }
+            i++;
         }
+        promise.addResult(u"---------------------------------\n %1 processed, %2 fixed, %3 skipped, %4 total"_qs
+                                  .replace(u"%1"_qs,QString::number(i))
+                                  .replace(u"%2"_qs,QString::number(fixed))
+                                  .replace(u"%3"_qs,QString::number(skipped))
+                                  .replace(u"%4"_qs,QString::number(total)));
     }
 }
 
-void FileSearchEntriesDialog::search(const QVector<BitTorrent::Torrent *> &torrents) {
-    m_watcher->setFuture(QtConcurrent::run(searchFn, torrents));
+void FileSearchEntriesDialog::loadTorrents(const QVector<BitTorrent::Torrent *> &torrents) {
+    m_watcher->cancel();
+    m_watcher->waitForFinished();
+    m_torrents = torrents;
+    setText(u"%1 torrents loaded.\n"_qs.replace(u"%1"_qs, QString::number(m_torrents.length())));
+}
+
+void FileSearchEntriesDialog::searchFiles() {
+    m_watcher->cancel();
+    m_watcher->waitForFinished();
+    setText(u"Searching %1 torrents\n"_qs.replace(u"%1"_qs, QString::number(m_torrents.length())));
+    m_watcher->setFuture(QtConcurrent::run(workerFn, m_torrents, false));
+}
+
+void FileSearchEntriesDialog::fixPaths() {
+    m_watcher->cancel();
+    m_watcher->waitForFinished();
+    setText(u"Fixing %1 torrents\n"_qs.replace(u"%1"_qs, QString::number(m_torrents.length())));
+    m_watcher->setFuture(QtConcurrent::run(workerFn, m_torrents, true));
 }
 
 void FileSearchEntriesDialog::setText(const QString &text)

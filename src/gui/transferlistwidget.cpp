@@ -788,7 +788,7 @@ void TransferListWidget::searchTorrentFiles()
     searcherDialog->setAttribute(Qt::WA_DeleteOnClose);
     searcherDialog->setText(u""_qs);
     searcherDialog->open();
-    searcherDialog->search(torrents);
+    searcherDialog->loadTorrents(torrents);
 }
 
 

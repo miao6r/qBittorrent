@@ -50,13 +50,14 @@ public:
     explicit FileSearchEntriesDialog(QWidget *parent);
     ~FileSearchEntriesDialog() override;
 
-    void search(const QVector<BitTorrent::Torrent *> &torrents);
+    void loadTorrents(const QVector<BitTorrent::Torrent *> &torrents);
     void setText(const QString &text);
     void appendText(const QString &text);
     QString text() const;
-
 private slots:
     void updateResults(int begin, int end);
+    void searchFiles();
+    void fixPaths();
 
 private:
     void saveSettings();
@@ -65,4 +66,5 @@ private:
     Ui::FileSearchEntriesDialog *m_ui = nullptr;
     SettingValue<QSize> m_storeDialogSize;
     QFutureWatcher<QString> *m_watcher = nullptr;
+    QVector<BitTorrent::Torrent *> m_torrents;
 };

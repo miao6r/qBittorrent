@@ -124,8 +124,8 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
             if(promise.isCanceled()) {
                 break;
             }
-            if(fixPath) {
-                if(foundCategories.size()==1) {
+
+                if(fixPath && foundCategories.size()==1 ) {
                     bool fixCategory = false;
                     bool fixSavePath = false;
                     if(torrent->category()!=foundCategories.first()) {
@@ -147,13 +147,14 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                     }
                 } else if(foundCategories.size()>1) {
                     promise.addResult(u"Error: found in multiple categories."_qs);
-                } else {
-                    promise.addResult(u"Error: no matched category."_qs);
+                } else if(foundCategories.isEmpty()){
+                    promise.addResult(u"No matched category."_qs);
                 }
             }
+            promise.addResult(u"--"_qs);
             i++;
         }
-        promise.addResult(u"---------------------------------\n %1 processed, %2 fixed, %3 skipped, %4 total"_qs
+        promise.addResult(u"===================\n %1 processed, %2 fixed, %3 skipped, %4 total"_qs
                                   .replace(u"%1"_qs,QString::number(i))
                                   .replace(u"%2"_qs,QString::number(fixed))
                                   .replace(u"%3"_qs,QString::number(skipped))

@@ -145,11 +145,11 @@ extern void workerFn(QPromise<QString> &promise, const QVector<BitTorrent::Torre
                         promise.addResult(u"Skipped: torrent is correct."_qs);
                         skipped++;
                     }
+                } else if(foundCategories.size()>1) {
+                    promise.addResult(u"Error: found in multiple categories."_qs);
                 } else {
-                    promise.addResult(u"Error: found in multiple categories, skipped."_qs);
+                    promise.addResult(u"Error: no matched category."_qs);
                 }
-            } else {
-                skipped++;
             }
             i++;
         }

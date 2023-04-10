@@ -61,6 +61,7 @@ apt install -y \
   libicu-dev \
   libgtk2.0-dev \
   build-essential \
+  libglvnd-dev \
   libgl1-mesa-dev \
   libfontconfig1-dev \
   libfreetype6-dev \

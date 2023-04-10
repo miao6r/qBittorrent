@@ -51,7 +51,7 @@ echo "xxxxxxxxxxxxxxx1"
 apt update --fix-missing
 apt upgrade -y
 echo "xxxxxxxxxxxxxxx2"
-apt install -y -f libglvnd-dev libglx-dev libgles-dev libegl-dev
+apt install -y -f libglvnd-dev
 
 apt install -y \
   curl \

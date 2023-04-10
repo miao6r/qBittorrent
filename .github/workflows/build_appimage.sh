@@ -47,9 +47,13 @@ if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
   sed -i 's@http://ppa.launchpad.net@https://launchpad.proxy.ustclug.org@' /etc/apt/sources.list.d/*.list
 fi
 apt-get clean
+echo "xxxxxxxxxxxxxxx1"
 apt update --fix-missing
+echo "xxxxxxxxxxxxxxx2"
 apt install -y -f libgl1-mesa-dev || exit 0
+echo "xxxxxxxxxxxxxxx3"
 apt --fix-broken install
+echo "xxxxxxxxxxxxxxx4"
 apt install -y \
   curl \
   git \

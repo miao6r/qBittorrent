@@ -50,7 +50,7 @@ apt-get clean
 echo "xxxxxxxxxxxxxxx1"
 apt update --fix-missing
 echo "xxxxxxxxxxxxxxx2"
-apt install -y -f libgl1-mesa-dev || exit 0
+apt install -y -f libgl1-mesa-dev || true
 echo "xxxxxxxxxxxxxxx3"
 apt --fix-broken install
 echo "xxxxxxxxxxxxxxx4"

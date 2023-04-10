@@ -40,8 +40,8 @@ echo '/usr/local/lib/x86_64-linux-gnu' >/etc/ld.so.conf.d/x86_64-linux-gnu-local
 
 apt update
 apt install -y software-properties-common apt-transport-https
-apt-add-repository -yn ppa:savoury1/backports
-add-apt-repository -yn ppa:savoury1/display
+#apt-add-repository -yn ppa:savoury1/backports
+#add-apt-repository -yn ppa:savoury1/display
 
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
   sed -i 's@http://ppa.launchpad.net@https://launchpad.proxy.ustclug.org@' /etc/apt/sources.list.d/*.list
@@ -49,11 +49,10 @@ fi
 apt-get clean
 echo "xxxxxxxxxxxxxxx1"
 apt update --fix-missing
+apt upgrade -y
 echo "xxxxxxxxxxxxxxx2"
-apt install -y -f libglvnd-dev || true
-echo "xxxxxxxxxxxxxxx3"
-apt --fix-broken install
-echo "xxxxxxxxxxxxxxx4"
+apt install -y -f libglvnd-dev libglx-dev libgles-dev libegl-dev
+
 apt install -y \
   curl \
   git \

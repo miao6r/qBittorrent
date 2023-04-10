@@ -46,8 +46,10 @@ add-apt-repository -yn ppa:savoury1/display
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
   sed -i 's@http://ppa.launchpad.net@https://launchpad.proxy.ustclug.org@' /etc/apt/sources.list.d/*.list
 fi
-
-apt update
+apt-get clean
+apt update --fix-missing
+apt install -y -f libgl1-mesa-dev || exit 0
+apt --fix-broken install
 apt install -y \
   curl \
   git \
@@ -61,7 +63,6 @@ apt install -y \
   libicu-dev \
   libgtk2.0-dev \
   build-essential \
-  libglvnd-dev \
   libgl1-mesa-dev \
   libfontconfig1-dev \
   libfreetype6-dev \

@@ -11,8 +11,7 @@
 set -o pipefail
 
 # match qt version prefix. E.g 5 --> 5.15.2, 5.12 --> 5.12.10
-export qt_ver="6.4.0"
-export QT_VER_PREFIX="6.4"
+export QT_VER_PREFIX="6"
 export LIBTORRENT_BRANCH="RC_1_2"
 
 rm -f /etc/apt/sources.list.d/*.list*
@@ -40,7 +39,8 @@ echo '/usr/local/lib/x86_64-linux-gnu' >/etc/ld.so.conf.d/x86_64-linux-gnu-local
 
 apt update
 apt install -y software-properties-common apt-transport-https
-
+apt-add-repository -yn ppa:savoury1/backports
+add-apt-repository -yn ppa:savoury1/display
 add-apt-repository ppa:ubuntu-toolchain-r/test
 
 if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
@@ -48,7 +48,6 @@ if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
 fi
 
 apt update
-
 apt install -y \
   curl \
   git \
@@ -58,9 +57,6 @@ apt install -y \
   libzstd-dev \
   zlib1g-dev \
   libbrotli-dev \
-  libdouble-conversion-dev \
-  libgraphite2-dev \
-  libsystemd-dev \
   libxcb1-dev \
   libicu-dev \
   libgtk2.0-dev \
@@ -90,7 +86,6 @@ apt install -y \
   libxcb-xkb-dev \
   libxkbcommon-dev \
   libxkbcommon-x11-dev \
-  libgtk-3-dev \
   gcc-8 \
   g++-8
 
@@ -106,7 +101,7 @@ export CXXFLAGS='-s'
 # Force refresh ld.so.cache
 ldconfig
 SELF_DIR="$(dirname "$(readlink -f "${0}")")"
-
+echo $SELF_DIR
 retry() {
   # max retry 5 times
   try=5
@@ -203,11 +198,6 @@ rm -fr CMakeCache.txt CMakeFiles
 #  -feature-optimize_full \
 ./configure \
   -ltcg \
-  -xcb \
-  -gtk \
-  -release \
-  -c++std c++17 \
-  -optimize-size \
   -openssl-linked \
   -qt-libjpeg \
   -qt-libpng \
@@ -215,15 +205,13 @@ rm -fr CMakeCache.txt CMakeFiles
   -qt-harfbuzz \
   -release \
   -c++std c++17 \
-  -feature-gtk3 \
+  -feature-optimize_full \
   -skip wayland \
-  -no-icu \
   -no-directfb \
   -no-linuxfb \
   -no-eglfs \
   -no-feature-testlib \
   -no-feature-vnc \
-  -feature-optimize_full \
   -nomake examples \
   -nomake tests
 cmake --build . --parallel
@@ -266,7 +254,7 @@ cmake --install .
 #cat config.summary
 #cmake --build . --parallel
 #cmake --install .
-ls -al /usr/local
+
 # install qt6gtk2 for better look
 if [ ! -d "/usr/src/qt6gtk2/" ]; then
   qt6gtk2_git_url="https://github.com/trialuser02/qt6gtk2.git"
@@ -337,6 +325,7 @@ ldconfig
 cd "${SELF_DIR}/../../"
 rm -fr build/CMakeCache.txt
 
+
 cmake \
   -B build \
   -G "Ninja" \
@@ -349,67 +338,6 @@ cmake \
 cmake --build build
 rm -fr /tmp/qbee/
 cmake --install build
-# build AppImage
-linuxdeploy_qt_download_url="https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
-if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
-  linuxdeploy_qt_download_url="https://ghproxy.com/${linuxdeploy_qt_download_url}"
-fi
-[ -x "/tmp/linuxdeploy-plugin-qt-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeploy-plugin-qt-x86_64.AppImage "${linuxdeploy_qt_download_url}"
-chmod -v +x '/tmp/linuxdeploy-plugin-qt-x86_64.AppImage'
-
-linuxdeploy_qt2_download_url="https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20220822-1/linuxdeploy-x86_64.AppImage"
-if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
-  linuxdeploy_qt2_download_url="https://ghproxy.com/${linuxdeploy_qt2_download_url}"
-fi
-[ -x "/tmp/linuxdeploy-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeploy-x86_64.AppImage "${linuxdeploy_qt2_download_url}"
-chmod -v +x '/tmp/linuxdeploy-x86_64.AppImage'
-
-
-
-cd "/tmp/qbee"
-ln -svf usr/share/icons/hicolor/scalable/apps/qbittorrent.svg /tmp/qbee/AppDir/
-ln -svf qbittorrent.svg /tmp/qbee/AppDir/.DirIcon
-mkdir -p "/tmp/qbee/AppDir/apprun-hooks/"
-cat >/tmp/qbee/AppDir/apprun-hooks/setup_env.sh <<EOF
-# this file is called from AppRun so 'root_dir' will point to where AppRun is
-root_dir="\$(readlink -f "\$(dirname "\$0")")"
-
-# Insert the default values because after the test we prepend our path
-# and it will create problems with DEs (eg KDE) that don't set the variable
-# and rely on the default paths
-if [[ -z \${XDG_DATA_DIRS} ]]; then
-    XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
-fi
-
-export XDG_DATA_DIRS="\${root_dir}/usr/share:\${XDG_DATA_DIRS}"
-case "\${QT_QPA_PLATFORMTHEME}" in
-    *gtk2*)
-        export QT_QPA_PLATFORMTHEME=qt6gtk2
-        ;;
-
-        *)
-        export QT_QPA_PLATFORMTHEME=gtk3
-        ;;
-esac
-
-case "\${QT_STYLE_OVERRIDE}" in
-    *gtk2*)
-        export QT_QPA_PLATFORMTHEME=qt6gtk2
-        unset QT_STYLE_OVERRIDE
-        ;;
-esac
-
-EOF
-
-cd "/tmp/qbee"
-#export EXTRA_QT_PLUGINS="styles;iconengines"
-#export DEPLOY_PLATFORM_THEMES=1
-export DEBUG=1
-#APPIMAGE_EXTRACT_AND_RUN=1  \
-#  OUTPUT='qBittorrent-x86_64-qt.AppImage' \
-#  /tmp/linuxdeploy-plugin-qt-x86_64.AppImage --appdir="/tmp/qbee/AppDir" --extra-plugin=styles,iconengines
-#
-
 
 # build AppImage
 linuxdeploy_qt_download_url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
@@ -419,32 +347,14 @@ fi
 [ -x "/tmp/linuxdeployqt-continuous-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeployqt-continuous-x86_64.AppImage "${linuxdeploy_qt_download_url}"
 chmod -v +x '/tmp/linuxdeployqt-continuous-x86_64.AppImage'
 cd "/tmp/qbee"
-
+ln -svf usr/share/icons/hicolor/scalable/apps/qbittorrent.svg /tmp/qbee/AppDir/
+ln -svf qbittorrent.svg /tmp/qbee/AppDir/.DirIcon
 cat >/tmp/qbee/AppDir/AppRun <<EOF
 #!/bin/bash -e
 this_dir="\$(readlink -f "\$(dirname "\$0")")"
-if [[ -z \${XDG_DATA_DIRS} ]]; then
-    XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
-fi
-
-export XDG_DATA_DIRS="\${this_dir}/usr/share:\${XDG_DATA_DIRS}"
-case "\${QT_QPA_PLATFORMTHEME}" in
-    *gtk2*)
-        export QT_QPA_PLATFORMTHEME=qt6gtk2
-        ;;
-
-        *)
-        export QT_QPA_PLATFORMTHEME=gtk3
-        ;;
-esac
-
-case "\${QT_STYLE_OVERRIDE}" in
-    *gtk2*)
-        export QT_QPA_PLATFORMTHEME=qt6gtk2
-        unset QT_STYLE_OVERRIDE
-        ;;
-esac
-
+#export XDG_DATA_DIRS="\${this_dir}/usr/share:\${XDG_DATA_DIRS}:/usr/share:/usr/local/share"
+#export QT_QPA_PLATFORMTHEMES=gtk2
+#export QT_STYLE_OVERRIDE=qt6gtk2
 # Find the system certificates location
 # https://gitlab.com/probono/platformissues/blob/master/README.md#certificates
 possible_locations=(
@@ -468,6 +378,12 @@ exec "\${this_dir}/usr/bin/qbittorrent" "\$@"
 EOF
 chmod 755 -v /tmp/qbee/AppDir/AppRun
 
+ls -al /tmp/qbee/AppDir/usr/share
+ls -al /tmp/qbee/AppDir/usr/bin
+
+
+#
+#  xcbglintegrations
 extra_plugins=(
   iconengines
   imageformats
@@ -477,7 +393,6 @@ extra_plugins=(
   platforms
   sqldrivers
   tls
-  xcbglintegrations
 )
 exclude_libs=(
   libatk-1.0.so.0
@@ -487,16 +402,16 @@ exclude_libs=(
   libboost_filesystem.so.1.58.0
   libboost_system.so.1.58.0
   libboost_system.so.1.65.1
-  libbsd.so.0
+#  libbsd.so.0
   libcairo-gobject.so.2
   libcairo.so.2
   libcapnp-0.5.3.so
   libcapnp-0.6.1.so
   libdatrie.so.1
-  libdbus-1.so.3
+#  libdbus-1.so.3
   libepoxy.so.0
   libffi.so.6
-  libgcrypt.so.20
+#  libgcrypt.so.20
   libgdk-3.so.0
   libgdk_pixbuf-2.0.so.0
   libgdk-x11-2.0.so.0
@@ -505,7 +420,7 @@ exclude_libs=(
   libgmodule-2.0.so.0
   libgobject-2.0.so.0
   libgraphite2.so.3
-  libgtk-3.so.0
+  #libgtk-3.so.0
   libgtk-x11-2.0.so.0
   libkj-0.5.3.so
   libkj-0.6.1.so
@@ -525,21 +440,21 @@ exclude_libs=(
   libwayland-cursor.so.0
   libwayland-egl.so.1
   libwayland-server.so.0
-  libX11-xcb.so.1
+#  libX11-xcb.so.1
   libXau.so.6
-  libxcb-glx.so.0
-  libxcb-icccm.so.4
-  libxcb-image.so.0
-  libxcb-keysyms.so.1
-  libxcb-randr.so.0
-  libxcb-render.so.0
-  libxcb-render-util.so.0
-  libxcb-shape.so.0
-  libxcb-shm.so.0
-  libxcb-sync.so.1
-  libxcb-util.so.1
-  libxcb-xfixes.so.0
-  libxcb-xkb.so.1
+#  libxcb-glx.so.0
+#  libxcb-icccm.so.4
+#  libxcb-image.so.0
+#  libxcb-keysyms.so.1
+#  libxcb-randr.so.0
+#  libxcb-render.so.0
+#  libxcb-render-util.so.0
+#  libxcb-shape.so.0
+#  libxcb-shm.so.0
+#  libxcb-sync.so.1
+#  libxcb-util.so.1
+#  libxcb-xfixes.so.0
+#  libxcb-xkb.so.1
   libXcomposite.so.1
   libXcursor.so.1
   libXdamage.so.1
@@ -563,8 +478,9 @@ APPIMAGE_EXTRACT_AND_RUN=1 \
   -always-overwrite \
   -appimage \
   -no-copy-copyright-files \
+  -updateinformation="zsync|https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/qBittorrent-x86_64.AppImage.zsync" \
   -extra-plugins="$(join_by ',' "${extra_plugins[@]}")" \
   -exclude-libs="$(join_by ',' "${exclude_libs[@]}")"
 
-
+# output file name should be qBittorrent-Enhanced-Edition-x86_64.AppImage
 cp -fv /tmp/qbee/qBittorrent*.AppImage* "${SELF_DIR}/"

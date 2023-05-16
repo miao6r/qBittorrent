@@ -774,6 +774,7 @@ Path SessionImpl::categoryDownloadPath(const QString &categoryName) const
 
 bool SessionImpl::addCategory(const QString &name, const CategoryOptions &options)
 {
+    m_categoryPaths.clear();
     if (name.isEmpty())
         return false;
 
@@ -791,7 +792,6 @@ bool SessionImpl::addCategory(const QString &name, const CategoryOptions &option
             }
         }
     }
-
     m_categories[name] = options;
     storeCategories();
     emit categoryAdded(name);
@@ -801,6 +801,7 @@ bool SessionImpl::addCategory(const QString &name, const CategoryOptions &option
 
 bool SessionImpl::editCategory(const QString &name, const CategoryOptions &options)
 {
+    m_categoryPaths.clear();
     const auto it = m_categories.find(name);
     if (it == m_categories.end())
         return false;
@@ -833,6 +834,7 @@ bool SessionImpl::editCategory(const QString &name, const CategoryOptions &optio
 
 bool SessionImpl::removeCategory(const QString &name)
 {
+    m_categoryPaths.clear();
     for (TorrentImpl *const torrent : asConst(m_torrents))
     {
         if (torrent->belongsToCategory(name))
@@ -2121,7 +2123,7 @@ void SessionImpl::handleDownloadFinished(const Net::DownloadResult &result)
     }
 }
 
-void SessionImpl::fileSearchFinished(const TorrentID &id, const Path &savePath, const PathList &fileNames)
+void SessionImpl::fileSearchFinished(const TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category, const bool skipChecking)
 {
     TorrentImpl *torrent = m_torrents.value(id);
     if (torrent)
@@ -2135,9 +2137,18 @@ void SessionImpl::fileSearchFinished(const TorrentID &id, const Path &savePath, 
     {
         LoadTorrentParams &params = loadingTorrentsIter.value();
         lt::add_torrent_params &p = params.ltAddTorrentParams;
-
+        if(!category.isEmpty()) {
+            params.category= category;
+        }
+        LogMsg(tr("%1 Save Path: \"%2\"").arg(params.name).arg(savePath.toString()));
+        // set seed_mode flag
+        if (skipChecking)
+            p.flags |= lt::torrent_flags::seed_mode;
+        else
+            p.flags &= ~lt::torrent_flags::seed_mode;
         p.save_path = savePath.toString().toStdString();
         const TorrentInfo torrentInfo {*p.ti};
+
         const auto nativeIndexes = torrentInfo.nativeIndexes();
         for (int i = 0; i < fileNames.size(); ++i)
             p.renamed_files[nativeIndexes[i]] = fileNames[i].toString().toStdString();
@@ -2618,13 +2629,16 @@ bool SessionImpl::addTorrent_impl(const std::variant<MagnetUri, TorrentInfo> &so
                 loadTorrentParams.name = contentName;
         }
 
-        if (!loadTorrentParams.hasSeedStatus)
-        {
-            const Path actualDownloadPath = useAutoTMM
-                    ? categoryDownloadPath(loadTorrentParams.category) : loadTorrentParams.downloadPath;
+
+
+        const Path actualDownloadPath = useAutoTMM
+                ? categoryDownloadPath(loadTorrentParams.category) : loadTorrentParams.downloadPath;
+        if( useAutoTMM || loadTorrentParams.category.isEmpty()) {
+            findIncompleteFilesAndCategory(torrentInfo, actualSavePath, actualDownloadPath,loadTorrentParams, filePaths);
+        } else {
             findIncompleteFiles(torrentInfo, actualSavePath, actualDownloadPath, filePaths);
-            isFindingIncompleteFiles = true;
         }
+        isFindingIncompleteFiles = true;
 
         const auto nativeIndexes = torrentInfo.nativeIndexes();
         if (!isFindingIncompleteFiles)
@@ -2741,7 +2755,35 @@ void SessionImpl::findIncompleteFiles(const TorrentInfo &torrentInfo, const Path
     const PathList originalFileNames = (filePaths.isEmpty() ? torrentInfo.filePaths() : filePaths);
     QMetaObject::invokeMethod(m_fileSearcher, [=]()
     {
-        m_fileSearcher->search(searchId, originalFileNames, savePath, downloadPath, isAppendExtensionEnabled());
+        m_fileSearcher->search(searchId, originalFileNames, savePath, downloadPath, isAppendExtensionEnabled(), false,  nullptr);
+    });
+}
+
+
+void SessionImpl::findIncompleteFilesAndCategory(const TorrentInfo &torrentInfo, const Path &savePath
+        , const Path &downloadPath, const LoadTorrentParams &torrentParams, const PathList &filePaths)
+{
+    if (m_categoryPaths.isEmpty()) {
+        QList<QString> cl = categories();
+        cl.sort();
+        QHash<QString, bool> visited;
+        for ( QString &category : cl) {
+            Path cp = categorySavePath(category);
+            QString ps = cp.toString();
+            if(visited.contains(ps)) {
+                continue;
+            }
+            visited[ps] = true;
+            m_categoryPaths.append(QPair<QString, Path>(category, cp));
+        }
+    }
+    Q_ASSERT(filePaths.isEmpty() || (filePaths.size() == torrentInfo.filesCount()));
+
+    const auto searchId = TorrentID::fromInfoHash(torrentInfo.infoHash());
+    const PathList originalFileNames = (filePaths.isEmpty() ? torrentInfo.filePaths() : filePaths);
+    QMetaObject::invokeMethod(m_fileSearcher, [=]()
+    {
+        m_fileSearcher->search(searchId, originalFileNames, savePath, downloadPath, isAppendExtensionEnabled(), torrentParams.hasSeedStatus, &m_categoryPaths);
     });
 }
 
@@ -4777,7 +4819,7 @@ void SessionImpl::upgradeCategories()
 void SessionImpl::loadCategories()
 {
     m_categories.clear();
-
+    m_categoryPaths.clear();
     QFile confFile {(specialFolderLocation(SpecialFolder::Config) / CATEGORIES_FILE_NAME).data()};
     if (!confFile.exists())
     {

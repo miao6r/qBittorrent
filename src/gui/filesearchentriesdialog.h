@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2020  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2019  Mike Tzou (Chocobo1)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,28 +28,43 @@
 
 #pragma once
 
-#include <QObject>
-#include <QMap>
+#include <QDialog>
+#include <QtContainerFwd>
+#include <QtConcurrent/QtConcurrent>
 
-#include "base/path.h"
+#include "base/settingvalue.h"
+#include "base/bittorrent/torrent.h"
 
-namespace BitTorrent
+
+namespace Ui
 {
-    class TorrentID;
+    class FileSearchEntriesDialog;
 }
 
-class FileSearcher final : public QObject
+class FileSearchEntriesDialog : public QDialog
 {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE(FileSearcher)
+    Q_DISABLE_COPY_MOVE(FileSearchEntriesDialog)
 
 public:
-    FileSearcher() = default;
+    explicit FileSearchEntriesDialog(QWidget *parent);
+    ~FileSearchEntriesDialog() override;
 
-public slots:
-    void search(const BitTorrent::TorrentID &id, const PathList &originalFileNames
-                , const Path &savePath, const Path &downloadPath, bool forceAppendExt, const bool skipChecking, const QList<QPair<QString, Path>> *categoryPaths);
+    void loadTorrents(const QVector<BitTorrent::Torrent *> &torrents);
+    void setText(const QString &text);
+    void appendText(const QString &text);
+    QString text() const;
+private slots:
+    void updateResults(int begin, int end);
+    void searchFiles();
+    void fixPaths();
 
-signals:
-    void searchFinished(const BitTorrent::TorrentID &id, const Path &savePath, const PathList &fileNames, const QString category, const bool skipChecking);
+private:
+    void saveSettings();
+    void loadSettings();
+
+    Ui::FileSearchEntriesDialog *m_ui = nullptr;
+    SettingValue<QSize> m_storeDialogSize;
+    QFutureWatcher<QString> *m_watcher = nullptr;
+    QVector<BitTorrent::Torrent *> m_torrents;
 };

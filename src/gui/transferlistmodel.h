@@ -145,5 +145,6 @@ private:
     QIcon m_stalledDLIcon;
     QIcon m_stalledUPIcon;
     QIcon m_uploadingIcon;
-    qint64 totalSize =0 ;
+    qint64 totalSize = 0 ;
+    QPair<qint64,qint64> *m_total = nullptr;
 };

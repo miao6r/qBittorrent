@@ -43,7 +43,6 @@
 #include <QWheelEvent>
 
 #include "base/bittorrent/session.h"
-#include "base/bittorrent/torrent.h"
 #include "base/bittorrent/trackerentry.h"
 #include "base/global.h"
 #include "base/logger.h"
@@ -63,6 +62,7 @@
 #include "torrentcategorydialog.h"
 #include "torrentoptionsdialog.h"
 #include "trackerentriesdialog.h"
+#include "filesearchentriesdialog.h"
 #include "transferlistdelegate.h"
 #include "transferlistmodel.h"
 #include "transferlistsortmodel.h"
@@ -307,7 +307,7 @@ void TransferListWidget::torrentDoubleClicked()
     }
 }
 
-QPair<qint64,qint64> *TransferListWidget::getSelectedTorrentsSize() const {
+QPair<qint64, qint64> * TransferListWidget::getSelectedTorrentsSize() {
     qint64 count = 0;
     qint64 size = 0;
     QVector<BitTorrent::Torrent *> selected = getSelectedTorrents();
@@ -315,18 +315,30 @@ QPair<qint64,qint64> *TransferListWidget::getSelectedTorrentsSize() const {
     for (BitTorrent::Torrent *const torrent : asConst(selected)) {
         size+=torrent->totalSize();
     }
-    return new QPair<qint64,qint64>(count,size);
+    if (!m_selected) {
+        m_selected = new QPair<qint64,qint64>(count,size);
+    } else {
+        m_selected->first = count;
+        m_selected->second = size;
+    }
+    return m_selected;
 }
 
-QPair<qint64,qint64> *TransferListWidget::getVisibleTorrentsSize() const {
+QPair<qint64,qint64> *TransferListWidget::getVisibleTorrentsSize() {
     qint64 count = 0;
     qint64 size = 0;
     QVector<BitTorrent::Torrent *> selected = getVisibleTorrents();
     count = selected.size();
-    for (BitTorrent::Torrent *const torrent : asConst(selected)) {
-        size+=torrent->totalSize();
+    for (BitTorrent::Torrent *const torrent: asConst(selected)) {
+        size += torrent->totalSize();
     }
-    return new QPair<qint64,qint64>(count,size);
+    if (!m_visible) {
+        m_visible = new QPair<qint64, qint64>(count, size);
+    } else {
+        m_visible->first = count;
+        m_visible->second = size;
+    }
+    return m_visible;
 }
 
 QVector<BitTorrent::Torrent *> TransferListWidget::getSelectedTorrents() const
@@ -769,6 +781,17 @@ void TransferListWidget::askAddTagsForSelection()
         addSelectionTag(tag);
 }
 
+void TransferListWidget::searchTorrentFiles()
+{
+    const QVector<BitTorrent::Torrent *> torrents = getSelectedTorrents();
+    auto searcherDialog = new FileSearchEntriesDialog(this);
+    searcherDialog->setAttribute(Qt::WA_DeleteOnClose);
+    searcherDialog->setText(u""_qs);
+    searcherDialog->open();
+    searcherDialog->loadTorrents(torrents);
+}
+
+
 void TransferListWidget::editTorrentTrackers()
 {
     const QVector<BitTorrent::Torrent *> torrents = getSelectedTorrents();
@@ -828,9 +851,17 @@ void TransferListWidget::exportTorrent()
         bool hasError = false;
         for (const BitTorrent::Torrent *torrent : torrents)
         {
-            const Path filePath = savePath / Path(torrent->name() + u".torrent");
+
+            const QString validName = Utils::Fs::toValidFileName(torrent->name());
+            const QString torrentId = torrent->infoHash().toTorrentID().toString().left(8);
+            QString torrentExportFilename = u"%1 %2.torrent"_qs.arg(validName).arg(torrentId);
+            Path filePath = savePath / Path(torrentExportFilename);
+            //int counter = 0;
             if (filePath.exists())
             {
+                // Append number to torrent name to make it unique
+                //torrentExportFilename = u"%1 %2.torrent"_qs.arg(validName).arg(++counter);
+                //filePath = savePath / Path(torrentExportFilename);
                 LogMsg(errorMsg.arg(torrent->name(), filePath.toString(), tr("A file with the same name already exists")) , Log::WARNING);
                 hasError = true;
                 continue;
@@ -1004,6 +1035,8 @@ void TransferListWidget::displayListMenu()
     connect(actionAutoTMM, &QAction::triggered, this, &TransferListWidget::setSelectedAutoTMMEnabled);
     auto *actionEditTracker = new QAction(UIThemeManager::instance()->getIcon(u"edit-rename"_qs), tr("Edit trac&kers..."), listMenu);
     connect(actionEditTracker, &QAction::triggered, this, &TransferListWidget::editTorrentTrackers);
+    auto *actionSearchFiles = new QAction(UIThemeManager::instance()->getIcon(u"set-location"_qs), tr("Search &files..."), listMenu);
+    connect(actionSearchFiles, &QAction::triggered, this, &TransferListWidget::searchTorrentFiles);
     auto *actionExportTorrent = new QAction(UIThemeManager::instance()->getIcon(u"edit-copy"_qs), tr("E&xport .torrent..."), listMenu);
     connect(actionExportTorrent, &QAction::triggered, this, &TransferListWidget::exportTorrent);
     // End of actions
@@ -1142,8 +1175,10 @@ void TransferListWidget::displayListMenu()
     listMenu->addAction(actionDelete);
     listMenu->addSeparator();
     listMenu->addAction(actionSetTorrentPath);
-    if (selectedIndexes.size() == 1)
+    if (selectedIndexes.size() == 1){
         listMenu->addAction(actionRename);
+    }
+    listMenu->addAction(actionSearchFiles);
     listMenu->addAction(actionEditTracker);
 
     // Category Menu

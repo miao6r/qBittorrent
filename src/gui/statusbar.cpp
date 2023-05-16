@@ -226,11 +226,14 @@ void StatusBar::updateDHTNodesNumber()
 
 void StatusBar::updateIOQueue()
 {
-    m_QueueLbl->setText(tr("I/O: %1 (%2) %3ms")
-                                .arg(Utils::Misc::friendlyUnit(
-                                        BitTorrent::Session::instance()->cacheStatus().queuedBytes,false))
-                                .arg(BitTorrent::Session::instance()->cacheStatus().jobQueueLength)
-                                .arg(BitTorrent::Session::instance()->cacheStatus().averageJobTime));
+    const BitTorrent::CacheStatus cs = BitTorrent::Session::instance()->cacheStatus();
+    const BitTorrent::SessionStatus ss = BitTorrent::Session::instance()->status();
+    m_QueueLbl->setText(u" Peers:%1 Cache:%2(%3%) I/O:%4(%5ms)"_qs
+                                .arg(ss.peersCount,false)
+                                .arg(Utils::Misc::friendlyUnit(cs.totalUsedBuffers * 16 * 1024, false))
+                                .arg((cs.readRatio > 0)? Utils::String::fromDouble((100 * cs.readRatio), 2): u"0"_qs)
+                                .arg(cs.jobQueueLength)
+                                .arg(cs.averageJobTime));
 }
 
 void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,qint64> *visible,QPair<qint64,qint64> *total)
@@ -249,12 +252,14 @@ void StatusBar::updateTorrentsSize(QPair<qint64,qint64> *selected,QPair<qint64,q
 
 void StatusBar::updateTorrentsCount()
 {
+    qDebug("updateTorrentsCount");
     m_TSCLbl->setText(tr("%1, %2, %3")
                                .arg(selectedLbl).arg(visibleLbl).arg(totalLbl));
 }
 
 void StatusBar::updateSpeedLabels()
 {
+    qDebug("updateSpeedLabels");
     const BitTorrent::SessionStatus &sessionStatus = BitTorrent::Session::instance()->status();
 
     QString dlSpeedLbl = Utils::Misc::friendlyUnit(sessionStatus.payloadDownloadRate, true);
@@ -278,7 +283,6 @@ void StatusBar::refresh()
     updateDHTNodesNumber();
     updateIOQueue();
     updateTorrentsCount();
-    updateSpeedLabels();
 }
 
 void StatusBar::updateAltSpeedsBtn(bool alternative)

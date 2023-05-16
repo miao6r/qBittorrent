@@ -31,8 +31,27 @@
 #include "base/bittorrent/infohash.h"
 
 void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &originalFileNames
-                          , const Path &savePath, const Path &downloadPath, const bool forceAppendExt)
+                          , const Path &savePath, const Path &downloadPath, const bool forceAppendExt,  const bool skipChecking, const QList<QPair<QString, Path>> *categoryPaths)
 {
+    const auto findAll = [](const Path &dirPath, PathList &fileNames, bool allowIncomplete) -> bool
+    {
+        for (Path &fileName : fileNames)
+        {
+            if (!(dirPath / fileName).exists())
+            {
+                if(!allowIncomplete) {
+                    return false;
+                }
+                const Path incompleteFilename = fileName + QB_EXT;
+                if (!(dirPath / incompleteFilename).exists())
+                {
+                    return false;
+                }
+            }
+
+        }
+        return true;
+    };
     const auto findInDir = [](const Path &dirPath, PathList &fileNames, const bool forceAppendExt) -> bool
     {
         bool found = false;
@@ -59,15 +78,46 @@ void FileSearcher::search(const BitTorrent::TorrentID &id, const PathList &origi
 
         return found;
     };
-
+    QString category;
     Path usedPath = savePath;
     PathList adjustedFileNames = originalFileNames;
-    const bool found = findInDir(usedPath, adjustedFileNames, (forceAppendExt && downloadPath.isEmpty()));
-    if (!found && !downloadPath.isEmpty())
-    {
-        usedPath = downloadPath;
-        findInDir(usedPath, adjustedFileNames, forceAppendExt);
+    bool skipping = skipChecking;
+    // search savePath for completed files first
+    PathList searchList;
+    searchList.append(originalFileNames.first());
+    bool found = findAll(usedPath, searchList, true);
+    if (!found && categoryPaths) {
+        // search category paths for completed files
+        for(const QPair<QString, Path> &cp : *categoryPaths) {
+            QString c = cp.first;
+            Path p = cp.second;
+            QString ps = p.toString();
+            if(findAll(p, searchList, true)) {
+                category = c;
+                usedPath = p;
+                skipping = true;
+                break;
+            }
+        }
     }
 
-    emit searchFinished(id, usedPath, adjustedFileNames);
+    if (skipChecking || skipping) {
+        qsizetype l = originalFileNames.length();
+        int step = l/10;
+        step = step<1?1:step;
+        for (int i=0; i< l;i+=step) {
+            searchList.append(originalFileNames.at(i));
+        }
+        skipping = findAll(usedPath, adjustedFileNames, false);
+    }
+
+    if(!skipping) {
+        found = findInDir(usedPath, adjustedFileNames, (forceAppendExt && downloadPath.isEmpty()));
+        if (!found && !downloadPath.isEmpty())
+        {
+            usedPath = downloadPath;
+            findInDir(usedPath, adjustedFileNames, forceAppendExt);
+        }
+    }
+    emit searchFinished(id, usedPath, adjustedFileNames, category, skipping);
 }

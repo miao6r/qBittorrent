@@ -52,19 +52,19 @@
     </message>
     <message>
         <source>Metadata received</source>
-        <translation type="unfinished" />
+        <translation>Üstveriler alındı</translation>
     </message>
     <message>
         <source>Files checked</source>
-        <translation type="unfinished" />
+        <translation>Dosyalar denetlendi</translation>
     </message>
     <message>
         <source>Stop condition:</source>
-        <translation type="unfinished" />
+        <translation>Durdurma koşulu:</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished" />
+        <translation>Yok</translation>
     </message>
 </context>
 <context>
@@ -605,11 +605,19 @@
     </message>
     <message>
         <source>Would you like to resume all torrents?</source>
-        <translation type="unfinished" />
+        <translation>Tüm torrent'leri devam ettirmek ister misiniz?</translation>
     </message>
     <message>
         <source>Would you like to pause all torrents?</source>
-        <translation type="unfinished" />
+        <translation>Tüm torrent'leri duraklatmak ister misiniz?</translation>
+    </message>
+    <message>
+        <source>Execution Log</source>
+        <translation>Çalıştırma Günlüğü</translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation>Günlük</translation>
     </message>
 </context>
 <context>
@@ -784,7 +792,7 @@
     </message>
     <message>
         <source>(None)</source>
-        <translation>(Yok)</translation>
+        <translation type="vanished">(Yok)</translation>
     </message>
     <message>
         <source>SOCKS4</source>
@@ -812,7 +820,7 @@
     </message>
     <message>
         <source>Use proxy only for torrents</source>
-        <translation>Sadece torrent'ler için proksi kullan</translation>
+        <translation type="vanished">Sadece torrent'ler için proksi kullan</translation>
     </message>
     <message>
         <source>Filter path (.dat, .p2p, .p2b):</source>
@@ -1622,34 +1630,94 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     </message>
     <message>
         <source>Files checked</source>
-        <translation type="unfinished" />
+        <translation>Dosyalar denetlendi</translation>
     </message>
     <message>
         <source>Enable port forwarding for embedded tracker:</source>
-        <translation type="unfinished" />
+        <translation>Gömülü izleyici için bağlantı noktası yönlendirmeyi etkinleştir:</translation>
     </message>
     <message>
         <source>If checked, hostname lookups are done via the proxy.</source>
-        <translation type="unfinished" />
+        <translation>Eğer işaretlendiyse, anamakine adı aramaları proksi aracılığıyla yapılır.</translation>
     </message>
     <message>
         <source>Use proxy for hostname lookup</source>
-        <translation type="unfinished" />
+        <translation>Anamakine adı araması için proksi kullan</translation>
     </message>
     <message>
         <source>Metadata received</source>
-        <translation type="unfinished" />
+        <translation>Üstveriler alındı</translation>
     </message>
     <message>
         <source>Torrent stop condition:</source>
-        <translation type="unfinished" />
+        <translation>Torrent durdurma koşulu:</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished" />
+        <translation>Yok</translation>
     </message>
     <message>
         <source>Example: 172.17.32.0/24, fdff:ffff:c8::/40</source>
+        <translation>Örnek: 172.17.32.0/24, fdff:ffff:c8::/40</translation>
+    </message>
+    <message>
+        <source>SQLite database (experimental)</source>
+        <translation>SQLite veritabanı (deneysel)</translation>
+    </message>
+    <message>
+        <source>Resume data storage type (requires restart):</source>
+        <translation>Devam verisi depolama türü (yeniden başlatma gerektirir):</translation>
+    </message>
+    <message>
+        <source>Fastresume files</source>
+        <translation>Hızlı devam dosyaları</translation>
+    </message>
+    <message>
+        <source>Backup the log file after:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Log file</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Behavior</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Delete backup logs older than:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Use proxy for BitTorrent purposes</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>years</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Save path:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>months</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Remember Multi-Rename settings</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Use proxy for general purposes</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Use proxy for RSS purposes</source>
         <translation type="unfinished" />
     </message>
 </context>
@@ -1733,7 +1801,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     </message>
     <message>
         <source>Peer ID Client</source>
-        <translation type="unfinished" />
+        <translation>Kişi Kimliği İstemcisi</translation>
     </message>
 </context>
 <context>
@@ -1955,6 +2023,66 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <message>
         <source>Progress:</source>
         <translation>İlerleme:</translation>
+    </message>
+    <message>
+        <source>Use regular expressions</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Filename + Extension</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Enumerate Files</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Rename failed: file or folder already exists</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Match all occurences</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Toggle Selection</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Replacement Input</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Extension</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Replace All</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Include files</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Include folders</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Search Files</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Case sensitive</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -2181,7 +2309,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <message>
         <source>Name</source>
         <comment>i.e: torrent name</comment>
-        <translation>Adı</translation>
+        <translation>Ad</translation>
     </message>
     <message>
         <source>Size</source>
@@ -2413,7 +2541,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     </message>
     <message>
         <source>Name</source>
-        <translation>Adı</translation>
+        <translation>Ad</translation>
     </message>
     <message>
         <source>Progress</source>
@@ -2430,6 +2558,14 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <message>
         <source>Add trackers...</source>
         <translation>İzleyicileri ekle...</translation>
+    </message>
+    <message>
+        <source>Renamed</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -2691,7 +2827,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     </message>
     <message>
         <source>Name</source>
-        <translation>Adı</translation>
+        <translation>Ad</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -2724,6 +2860,14 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <message>
         <source>Remove</source>
         <translation>Kaldır</translation>
+    </message>
+    <message>
+        <source>Rename Files...</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Renaming</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -3010,7 +3154,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <name>SearchResultsTable</name>
     <message>
         <source>Name</source>
-        <translation>Adı</translation>
+        <translation>Ad</translation>
     </message>
     <message>
         <source>Size</source>
@@ -3033,7 +3177,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <name>SearchPluginsTable</name>
     <message>
         <source>Name</source>
-        <translation>Adı</translation>
+        <translation>Ad</translation>
     </message>
     <message>
         <source>Url</source>
@@ -3169,7 +3313,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     </message>
     <message>
         <source>Name:</source>
-        <translation>Adı:</translation>
+        <translation>Ad:</translation>
     </message>
     <message>
         <source>About qBittorrent</source>
@@ -3243,7 +3387,7 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     </message>
     <message>
         <source>Name</source>
-        <translation>Adı</translation>
+        <translation>Ad</translation>
     </message>
     <message>
         <source>Description page URL</source>
@@ -3267,6 +3411,10 @@ sunucusu tarafından kullanılan etki alanı adlarına eklemelisiniz.
     <message>
         <source>New name:</source>
         <translation>Yeni adı:</translation>
+    </message>
+    <message>
+        <source>Renaming)</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -3645,6 +3793,141 @@ Desteklenen biçimler: S01E01, 1x1, 2017.12.31 ve 31.12.2017 (Tarih biçimleri d
     <message>
         <source>Unread</source>
         <translation>Okunmadı</translation>
+    </message>
+</context>
+<context>
+    <name>ExecutionLogWidget</name>
+    <message>
+        <source>General</source>
+        <translation>Genel</translation>
+    </message>
+    <message>
+        <source>Blocked</source>
+        <translation>Engellenmiş</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Bilinmiyor</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Tümü</translation>
+    </message>
+    <message>
+        <source>showing</source>
+        <translation>gösterilen</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Kopyala</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Tümünü Seç</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>Kimlik</translation>
+    </message>
+    <message>
+        <source>Log Type</source>
+        <translation>Günlük Türü</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Temizle</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Uyarı</translation>
+    </message>
+    <message>
+        <source>Information Messages</source>
+        <translation>Bilgi İletileri</translation>
+    </message>
+    <message>
+        <source>Warning Messages</source>
+        <translation>Uyarı İletileri</translation>
+    </message>
+    <message>
+        <source>Filter logs</source>
+        <translation>Günlükleri süz</translation>
+    </message>
+    <message>
+        <source>Blocked IPs</source>
+        <translation>Engellenen IP'ler</translation>
+    </message>
+    <message>
+        <source>out of</source>
+        <translation>/</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Durum</translation>
+    </message>
+    <message>
+        <source>Timestamp</source>
+        <translation>Zaman Damgası</translation>
+    </message>
+    <message>
+        <source>Clear All</source>
+        <translation>Tümünü Temizle</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>İleti</translation>
+    </message>
+    <message>
+        <source>Log Levels:</source>
+        <translation>Günlük Seviyeleri:</translation>
+    </message>
+    <message>
+        <source>Reason</source>
+        <translation>Sebep</translation>
+    </message>
+    <message>
+        <source>item</source>
+        <translation>öğe</translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation>IP</translation>
+    </message>
+    <message>
+        <source>Banned</source>
+        <translation>Yasaklı</translation>
+    </message>
+    <message>
+        <source>Normal Messages</source>
+        <translation>Normal İletiler</translation>
+    </message>
+    <message>
+        <source>Critical</source>
+        <translation>Önemli</translation>
+    </message>
+    <message>
+        <source>Critical Messages</source>
+        <translation>Önemli İletiler</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>items</source>
+        <translation>öğe</translation>
+    </message>
+    <message>
+        <source>Results</source>
+        <translation>Sonuçlar</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>Bilgi</translation>
+    </message>
+    <message>
+        <source>Choose a log level...</source>
+        <translation>Bir günlük seviyesi seçin...</translation>
     </message>
 </context>
 </TS>

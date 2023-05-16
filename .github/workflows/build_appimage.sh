@@ -10,9 +10,9 @@
 
 set -o pipefail
 
-
 # match qt version prefix. E.g 5 --> 5.15.2, 5.12 --> 5.12.10
-export QT_VER_PREFIX="6"
+export qt_ver="6.4.0"
+export QT_VER_PREFIX="6.4"
 export LIBTORRENT_BRANCH="RC_1_2"
 
 rm -f /etc/apt/sources.list.d/*.list*
@@ -48,6 +48,7 @@ if [ x"${USE_CHINA_MIRROR}" = x1 ]; then
 fi
 
 apt update
+
 apt install -y \
   curl \
   git \
@@ -74,6 +75,7 @@ apt install -y \
   libxi-dev \
   libxrender-dev \
   libxcb1-dev \
+  libxcb-glx0-dev \
   libxcb-keysyms1-dev \
   libxcb-image0-dev \
   libxcb-shm0-dev \
@@ -104,7 +106,6 @@ export CXXFLAGS='-s'
 # Force refresh ld.so.cache
 ldconfig
 SELF_DIR="$(dirname "$(readlink -f "${0}")")"
-echo $SELF_DIR
 
 retry() {
   # max retry 5 times
@@ -132,8 +133,6 @@ join_by() {
   shift
   printf "%s" "$first" "${@/#/$separator}"
 }
-
-
 
 # install cmake and ninja-build
 if ! which cmake &>/dev/null; then
@@ -206,6 +205,9 @@ rm -fr CMakeCache.txt CMakeFiles
   -ltcg \
   -xcb \
   -gtk \
+  -release \
+  -c++std c++17 \
+  -optimize-size \
   -openssl-linked \
   -qt-libjpeg \
   -qt-libpng \
@@ -213,14 +215,15 @@ rm -fr CMakeCache.txt CMakeFiles
   -qt-harfbuzz \
   -release \
   -c++std c++17 \
-  -feature-optimize_full \
   -feature-gtk3 \
   -skip wayland \
+  -no-icu \
   -no-directfb \
   -no-linuxfb \
   -no-eglfs \
   -no-feature-testlib \
   -no-feature-vnc \
+  -feature-optimize_full \
   -nomake examples \
   -nomake tests
 cmake --build . --parallel
@@ -334,7 +337,6 @@ ldconfig
 cd "${SELF_DIR}/../../"
 rm -fr build/CMakeCache.txt
 
-
 cmake \
   -B build \
   -G "Ninja" \
@@ -417,6 +419,7 @@ fi
 [ -x "/tmp/linuxdeployqt-continuous-x86_64.AppImage" ] || retry curl -kSLC- -o /tmp/linuxdeployqt-continuous-x86_64.AppImage "${linuxdeploy_qt_download_url}"
 chmod -v +x '/tmp/linuxdeployqt-continuous-x86_64.AppImage'
 cd "/tmp/qbee"
+
 cat >/tmp/qbee/AppDir/AppRun <<EOF
 #!/bin/bash -e
 this_dir="\$(readlink -f "\$(dirname "\$0")")"
@@ -465,8 +468,6 @@ exec "\${this_dir}/usr/bin/qbittorrent" "\$@"
 EOF
 chmod 755 -v /tmp/qbee/AppDir/AppRun
 
-#
-#  xcbglintegrations
 extra_plugins=(
   iconengines
   imageformats
@@ -476,6 +477,7 @@ extra_plugins=(
   platforms
   sqldrivers
   tls
+  xcbglintegrations
 )
 exclude_libs=(
   libatk-1.0.so.0

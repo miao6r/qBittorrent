@@ -52,19 +52,19 @@
     </message>
     <message>
         <source>Metadata received</source>
-        <translation type="unfinished" />
+        <translation>수신된 메타데이터</translation>
     </message>
     <message>
         <source>Files checked</source>
-        <translation type="unfinished" />
+        <translation>파일 확인됨</translation>
     </message>
     <message>
         <source>Stop condition:</source>
-        <translation type="unfinished" />
+        <translation>중지 조건:</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished" />
+        <translation>없음</translation>
     </message>
 </context>
 <context>
@@ -605,11 +605,19 @@
     </message>
     <message>
         <source>Would you like to resume all torrents?</source>
-        <translation type="unfinished" />
+        <translation>모든 토렌트를 이어받기하시겠습니까?</translation>
     </message>
     <message>
         <source>Would you like to pause all torrents?</source>
-        <translation type="unfinished" />
+        <translation>모든 토렌트를 일시 정지하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Execution Log</source>
+        <translation>실행 로그</translation>
+    </message>
+    <message>
+        <source>Log</source>
+        <translation>로그</translation>
     </message>
 </context>
 <context>
@@ -784,7 +792,7 @@
     </message>
     <message>
         <source>(None)</source>
-        <translation>(없음)</translation>
+        <translation type="vanished">(없음)</translation>
     </message>
     <message>
         <source>SOCKS4</source>
@@ -812,7 +820,7 @@
     </message>
     <message>
         <source>Use proxy only for torrents</source>
-        <translation>토렌트에 프록시만 사용하기</translation>
+        <translation type="vanished">토렌트에 프록시만 사용하기</translation>
     </message>
     <message>
         <source>Filter path (.dat, .p2p, .p2b):</source>
@@ -1018,7 +1026,7 @@
     </message>
     <message>
         <source>Delete .torrent files afterwards</source>
-        <translation>다운로드 후 .torrent 파일 삭제하기</translation>
+        <translation>내려받은 후 .torrent 파일 삭제하기</translation>
     </message>
     <message>
         <source>Download rate threshold:</source>
@@ -1622,34 +1630,94 @@ DNS 재결합 공격을 방어하기 위해
     </message>
     <message>
         <source>Files checked</source>
-        <translation type="unfinished" />
+        <translation>파일 확인됨</translation>
     </message>
     <message>
         <source>Enable port forwarding for embedded tracker:</source>
-        <translation type="unfinished" />
+        <translation>임베디드 트래커에 대한 포트 포워딩 활성화</translation>
     </message>
     <message>
         <source>If checked, hostname lookups are done via the proxy.</source>
-        <translation type="unfinished" />
+        <translation>이 옵션을 선택하면, 프록시를 통해 호스트 이름 검색이 수행됩니다.</translation>
     </message>
     <message>
         <source>Use proxy for hostname lookup</source>
-        <translation type="unfinished" />
+        <translation>호스트 이름 조회에 프록시 사용하기</translation>
     </message>
     <message>
         <source>Metadata received</source>
-        <translation type="unfinished" />
+        <translation>수신된 메타데이터</translation>
     </message>
     <message>
         <source>Torrent stop condition:</source>
-        <translation type="unfinished" />
+        <translation>토렌트 중지 조건:</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished" />
+        <translation>없음</translation>
     </message>
     <message>
         <source>Example: 172.17.32.0/24, fdff:ffff:c8::/40</source>
+        <translation>예시: 172.17.32.0/24, fdff:ffff:c8::/40</translation>
+    </message>
+    <message>
+        <source>SQLite database (experimental)</source>
+        <translation>SQLite 데이터베이스 (실험적)</translation>
+    </message>
+    <message>
+        <source>Resume data storage type (requires restart):</source>
+        <translation>이어받기 데이터 저장소 유형 (재시작 필요):</translation>
+    </message>
+    <message>
+        <source>Fastresume files</source>
+        <translation>Fastresume 파일</translation>
+    </message>
+    <message>
+        <source>Backup the log file after:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Log file</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Behavior</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Delete backup logs older than:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Use proxy for BitTorrent purposes</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>years</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Save path:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>months</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Remember Multi-Rename settings</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Use proxy for general purposes</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Use proxy for RSS purposes</source>
         <translation type="unfinished" />
     </message>
 </context>
@@ -1684,7 +1752,7 @@ DNS 재결합 공격을 방어하기 위해
     <message>
         <source>Down Speed</source>
         <comment>i.e: Download speed</comment>
-        <translation>다운로드 속도</translation>
+        <translation>받기 속도</translation>
     </message>
     <message>
         <source>Up Speed</source>
@@ -1733,7 +1801,7 @@ DNS 재결합 공격을 방어하기 위해
     </message>
     <message>
         <source>Peer ID Client</source>
-        <translation type="unfinished" />
+        <translation>피어 ID 클라이언트</translation>
     </message>
 </context>
 <context>
@@ -1955,6 +2023,66 @@ DNS 재결합 공격을 방어하기 위해
     <message>
         <source>Progress:</source>
         <translation>진행률:</translation>
+    </message>
+    <message>
+        <source>Use regular expressions</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Filename + Extension</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Enumerate Files</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Rename failed: file or folder already exists</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Match all occurences</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Toggle Selection</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Replacement Input</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Extension</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Replace All</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Include files</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Include folders</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Search Files</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Case sensitive</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -2211,7 +2339,7 @@ DNS 재결합 공격을 방어하기 위해
     <message>
         <source>Down Speed</source>
         <comment>i.e: Download speed</comment>
-        <translation>다운로드 속도</translation>
+        <translation>받기 속도</translation>
     </message>
     <message>
         <source>Up Speed</source>
@@ -2253,7 +2381,7 @@ DNS 재결합 공격을 방어하기 위해
     <message>
         <source>Down Limit</source>
         <comment>i.e: Download limit</comment>
-        <translation>다운로드 제한</translation>
+        <translation>받기 제한</translation>
     </message>
     <message>
         <source>Up Limit</source>
@@ -2430,6 +2558,14 @@ DNS 재결합 공격을 방어하기 위해
     <message>
         <source>Add trackers...</source>
         <translation>트래커 추가하기…</translation>
+    </message>
+    <message>
+        <source>Renamed</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -2725,6 +2861,14 @@ DNS 재결합 공격을 방어하기 위해
         <source>Remove</source>
         <translation>제거하기</translation>
     </message>
+    <message>
+        <source>Rename Files...</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Renaming</source>
+        <translation type="unfinished" />
+    </message>
 </context>
 <context>
     <name>UpDownRatioDialog</name>
@@ -2760,7 +2904,7 @@ DNS 재결합 공격을 방어하기 위해
     <name>confirmDeletionDlg</name>
     <message>
         <source>Also permanently delete the files</source>
-        <translation>영구적으로 파일도 삭제하기</translation>
+        <translation>또한 파일을 영구적으로 삭제합니다</translation>
     </message>
     <message>
         <source>Remove torrent(s)</source>
@@ -3268,6 +3412,10 @@ DNS 재결합 공격을 방어하기 위해
         <source>New name:</source>
         <translation>새 이름:</translation>
     </message>
+    <message>
+        <source>Renaming)</source>
+        <translation type="unfinished" />
+    </message>
 </context>
 <context>
     <name>RSSWidget</name>
@@ -3301,7 +3449,7 @@ DNS 재결합 공격을 방어하기 위해
     </message>
     <message>
         <source>Mark items read</source>
-        <translation>읽은 것으로 표시</translation>
+        <translation>읽은 항목들 표시</translation>
     </message>
     <message>
         <source>Update all feeds</source>
@@ -3645,6 +3793,141 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     <message>
         <source>Unread</source>
         <translation>읽지 않음</translation>
+    </message>
+</context>
+<context>
+    <name>ExecutionLogWidget</name>
+    <message>
+        <source>General</source>
+        <translation>일반</translation>
+    </message>
+    <message>
+        <source>Blocked</source>
+        <translation>차단됨</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>알 수 없음</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>모두</translation>
+    </message>
+    <message>
+        <source>showing</source>
+        <translation>보여주기</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>복사하기</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>모두 선택하기</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Log Type</source>
+        <translation>로그 유형</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>지우기</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>경고</translation>
+    </message>
+    <message>
+        <source>Information Messages</source>
+        <translation>정보 메시지</translation>
+    </message>
+    <message>
+        <source>Warning Messages</source>
+        <translation>경고 메시지</translation>
+    </message>
+    <message>
+        <source>Filter logs</source>
+        <translation>필터 로그</translation>
+    </message>
+    <message>
+        <source>Blocked IPs</source>
+        <translation>차단된 IP</translation>
+    </message>
+    <message>
+        <source>out of</source>
+        <translation>벗어남</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>상태</translation>
+    </message>
+    <message>
+        <source>Timestamp</source>
+        <translation>타임스탬프</translation>
+    </message>
+    <message>
+        <source>Clear All</source>
+        <translation>모두 지우기</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>메시지</translation>
+    </message>
+    <message>
+        <source>Log Levels:</source>
+        <translation>로그 레벨:</translation>
+    </message>
+    <message>
+        <source>Reason</source>
+        <translation>원인</translation>
+    </message>
+    <message>
+        <source>item</source>
+        <translation>항목</translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation>IP</translation>
+    </message>
+    <message>
+        <source>Banned</source>
+        <translation>금지됨</translation>
+    </message>
+    <message>
+        <source>Normal Messages</source>
+        <translation>정상 메시지</translation>
+    </message>
+    <message>
+        <source>Critical</source>
+        <translation>중요</translation>
+    </message>
+    <message>
+        <source>Critical Messages</source>
+        <translation>중요 메시지</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>정상</translation>
+    </message>
+    <message>
+        <source>items</source>
+        <translation>항목들</translation>
+    </message>
+    <message>
+        <source>Results</source>
+        <translation>결과</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>정보</translation>
+    </message>
+    <message>
+        <source>Choose a log level...</source>
+        <translation>로그 레벨 선정하기...</translation>
     </message>
 </context>
 </TS>
